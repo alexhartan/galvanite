@@ -2,13 +2,21 @@
   "name": "@galvanite/tokens",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "description": "Galvanite design tokens: color, typography, spacing, and other shared foundations.",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
@@ -16,7 +24,10 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@eslint/js": "^10",
+    "eslint": "^10",
     "tsup": "^8.3.5",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8"
   }
 }

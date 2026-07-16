@@ -3,6 +3,7 @@
 import { Checkbox as CheckboxPrimitive } from "@base-ui/react/checkbox"
 
 import { cn } from "@/lib/utils"
+import type { ComponentMeta } from "@/lib/component-meta"
 import { CheckIcon } from "lucide-react"
 
 function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
@@ -27,3 +28,39 @@ function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
 }
 
 export { Checkbox }
+export const meta: ComponentMeta = {
+  name: "Checkbox",
+  description: "Binary (or indeterminate) toggle for a single option or list item.",
+  category: "forms",
+  status: "stable",
+  structure: {
+    anatomy: ["root box", "check indicator"],
+    composition: "Pair with a Label; group several for multi-select lists.",
+  },
+  appearance: {
+    tokens: ["primary", "primary-foreground", "input", "ring", "border"],
+    states: ["unchecked", "checked", "indeterminate", "focus-visible", "disabled"],
+  },
+  behavior: {
+    interactions: ["click", "Space to toggle"],
+    events: ["onCheckedChange"],
+    controllable: true,
+  },
+  accessibility: {
+    role: "checkbox",
+    keyboard: ["Space toggles", "Tab focuses"],
+    aria: ["aria-checked reflects state incl. mixed"],
+  },
+  aiHints: {
+    priority: 2,
+    useCases: ["Accept terms", "Multi-select from a list", "Toggle a boolean setting inline with text"],
+    selectionCriteria: {
+      Checkbox: "Multiple independent options can be on at once.",
+    },
+    antiPatterns: [
+      { avoid: "Using a Checkbox for an instant on/off preference", reason: "Switch communicates immediate effect better.", instead: "Use Switch for settings that apply immediately." },
+    ],
+    whenNotToUse: ["For mutually exclusive choices use radios/Select", "For immediate settings use Switch"],
+    pairsWith: ["Label"],
+  },
+}

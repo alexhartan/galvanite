@@ -1,5 +1,6 @@
 import { ArrowRight, Rocket, Sparkles } from "lucide-react";
 
+import { ComponentMetaExplorer } from "@/components/component-meta-explorer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -267,6 +268,18 @@ export default function Home() {
               </CardContent>
             </Card>
           </div>
+        </Section>
+
+        {/* Component metadata — four pillars + aiHints */}
+        <Section title="Component metadata">
+          <p className="max-w-2xl text-muted-foreground">
+            Every component ships a machine-readable{" "}
+            <code className="text-foreground">meta</code> — the four pillars
+            (Structure · Appearance · Behavior · Accessibility) plus{" "}
+            <code className="text-foreground">aiHints</code> — so humans and
+            agents can pick and use it correctly.
+          </p>
+          <ComponentMetaExplorer />
         </Section>
 
         <footer className="pt-8 text-sm text-muted-foreground">

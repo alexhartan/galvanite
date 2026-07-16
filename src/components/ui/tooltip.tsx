@@ -3,6 +3,7 @@
 import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip"
 
 import { cn } from "@/lib/utils"
+import type { ComponentMeta } from "@/lib/component-meta"
 
 function TooltipProvider({
   delay = 0,
@@ -64,3 +65,39 @@ function TooltipContent({
 }
 
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }
+export const meta: ComponentMeta = {
+  name: "Tooltip",
+  description: "Transient popover that labels or explains a control on hover/focus.",
+  category: "overlay",
+  status: "stable",
+  structure: {
+    anatomy: ["TooltipProvider", "Tooltip", "TooltipTrigger", "TooltipContent"],
+    parts: ["TooltipProvider", "Tooltip", "TooltipTrigger", "TooltipContent"],
+    composition: "Wrap the app/subtree in TooltipProvider; Trigger renders the target element.",
+  },
+  appearance: {
+    tokens: ["popover", "popover-foreground", "primary", "primary-foreground"],
+    states: ["hidden", "delayed-open", "open"],
+  },
+  behavior: {
+    interactions: ["hover", "focus", "Esc to dismiss"],
+    events: ["onOpenChange"],
+    controllable: true,
+    notes: ["Opens after a short delay; content must be non-essential."],
+  },
+  accessibility: {
+    role: "tooltip",
+    keyboard: ["Focus reveals", "Esc dismisses"],
+    aria: ["links trigger and content via aria-describedby"],
+    notes: ["Never put interactive elements inside; not shown on touch."],
+  },
+  aiHints: {
+    priority: 3,
+    useCases: ["Name an icon-only Button", "Explain a terse label", "Reveal a shortcut"],
+    antiPatterns: [
+      { avoid: "Putting essential info or actions only in a Tooltip", reason: "Unavailable on touch and to some AT.", instead: "Show inline, or use a Popover for interactive content." },
+    ],
+    whenNotToUse: ["Rich/interactive content (use Popover)", "Long-form help"],
+    pairsWith: ["Button"],
+  },
+}

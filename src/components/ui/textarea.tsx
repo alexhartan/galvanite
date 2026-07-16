@@ -1,6 +1,7 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
+import type { ComponentMeta } from "@/lib/component-meta"
 
 function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
   return (
@@ -16,3 +17,35 @@ function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
 }
 
 export { Textarea }
+export const meta: ComponentMeta = {
+  name: "Textarea",
+  description: "Multi-line text field for longer free-form entry.",
+  category: "forms",
+  status: "stable",
+  structure: {
+    anatomy: ["root textarea"],
+    composition: "Pair with a Label; grows to fit content per field styling.",
+  },
+  appearance: {
+    tokens: ["input", "background", "foreground", "muted-foreground", "ring", "destructive"],
+    states: ["rest", "focus-visible", "disabled", "invalid"],
+  },
+  behavior: {
+    interactions: ["type", "focus", "blur", "resize"],
+    events: ["onChange", "onFocus", "onBlur"],
+    controllable: true,
+  },
+  accessibility: {
+    role: "textbox (multiline)",
+    aria: ["associate a Label or aria-label", "aria-invalid toggles the error ring"],
+  },
+  aiHints: {
+    priority: 2,
+    useCases: ["Messages/comments", "Descriptions", "Any content over one line"],
+    antiPatterns: [
+      { avoid: "Using Textarea for a single short value", reason: "Over-sized target for one line.", instead: "Use Input." },
+    ],
+    whenNotToUse: ["For rich text use a dedicated editor"],
+    pairsWith: ["Label", "Button"],
+  },
+}

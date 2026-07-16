@@ -2,6 +2,7 @@ import { Button as ButtonPrimitive } from "@base-ui/react/button"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
+import type { ComponentMeta } from "@/lib/component-meta"
 
 const buttonVariants = cva(
   "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
@@ -60,3 +61,51 @@ function Button({
 }
 
 export { Button, buttonVariants }
+export const meta: ComponentMeta = {
+  name: "Button",
+  description:
+    "Primary interactive control that triggers an action or navigation. Carries the Galvanite yellow CTA as its `brand` variant.",
+  category: "actions",
+  status: "stable",
+  structure: {
+    anatomy: ["root", "leading icon (optional)", "label", "trailing icon (optional)"],
+    composition: "Icons are auto-sized; use asChild/render to render as a link or other element.",
+  },
+  appearance: {
+    variants: ["default", "outline", "secondary", "ghost", "destructive", "link", "brand"],
+    sizes: ["xs", "sm", "default", "lg", "xl", "icon", "icon-sm", "icon-lg"],
+    tokens: ["primary", "primary-foreground", "secondary", "muted", "destructive", "ring", "background", "foreground"],
+    states: ["rest", "hover", "focus-visible", "active", "disabled"],
+  },
+  behavior: {
+    interactions: ["click", "keyboard activation (Enter/Space)"],
+    events: ["onClick"],
+    controllable: false,
+    notes: ["`brand` inverts yellow→deep-navy on hover with a blue glow, mirroring galvanite.io."],
+  },
+  accessibility: {
+    role: "button",
+    keyboard: ["Enter / Space to activate", "Tab to focus"],
+    aria: ["aria-label required for icon-only buttons", "aria-disabled reflects disabled"],
+    notes: ["Focus-visible ring uses --ring."],
+  },
+  aiHints: {
+    priority: 1,
+    useCases: ["Submit a form", "Primary page call-to-action", "Trigger a dialog or menu", "Inline row actions"],
+    selectionCriteria: {
+      brand: "The single most important CTA on a marketing/hero surface.",
+      default: "Standard primary action inside app UI.",
+      secondary: "Alternative action shown next to a primary one.",
+      outline: "Low-emphasis action that still needs a visible boundary.",
+      ghost: "Tertiary action in toolbars or dense UI.",
+      destructive: "Irreversible or dangerous actions (delete, remove).",
+      link: "Navigation styled as inline text.",
+    },
+    antiPatterns: [
+      { avoid: "Using more than one `brand` button in a viewport", reason: "Dilutes the single-CTA hierarchy of the brand.", instead: "Pair one `brand` with `secondary`/`outline`." },
+      { avoid: "Icon-only button without a label", reason: "Screen readers announce nothing.", instead: "Add aria-label or wrap in a Tooltip with an accessible name." },
+    ],
+    whenNotToUse: ["For navigation between pages prefer a link", "For binary on/off state use Switch or Checkbox"],
+    pairsWith: ["Tooltip", "Card", "Input"],
+  },
+}

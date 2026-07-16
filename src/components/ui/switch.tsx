@@ -3,6 +3,7 @@
 import { Switch as SwitchPrimitive } from "@base-ui/react/switch"
 
 import { cn } from "@/lib/utils"
+import type { ComponentMeta } from "@/lib/component-meta"
 
 function Switch({
   className,
@@ -30,3 +31,37 @@ function Switch({
 }
 
 export { Switch }
+export const meta: ComponentMeta = {
+  name: "Switch",
+  description: "Toggle for a setting that takes effect immediately.",
+  category: "forms",
+  status: "stable",
+  structure: {
+    anatomy: ["track", "thumb"],
+    composition: "Pair with a Label describing the setting.",
+  },
+  appearance: {
+    tokens: ["primary", "input", "background", "ring"],
+    states: ["off", "on", "focus-visible", "disabled"],
+  },
+  behavior: {
+    interactions: ["click", "Space/Enter to toggle"],
+    events: ["onCheckedChange"],
+    controllable: true,
+    notes: ["Implies the change applies at once — no separate save."],
+  },
+  accessibility: {
+    role: "switch",
+    keyboard: ["Space/Enter toggles", "Tab focuses"],
+    aria: ["aria-checked reflects state"],
+  },
+  aiHints: {
+    priority: 2,
+    useCases: ["Enable/disable a feature", "On/off preferences that apply instantly"],
+    antiPatterns: [
+      { avoid: "Requiring a separate Save after a Switch", reason: "Contradicts its immediate-effect affordance.", instead: "Apply on change, or use a Checkbox in a form that saves." },
+    ],
+    whenNotToUse: ["For selecting among 3+ options use Select/Tabs"],
+    pairsWith: ["Label"],
+  },
+}

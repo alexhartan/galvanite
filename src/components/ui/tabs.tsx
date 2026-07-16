@@ -4,6 +4,7 @@ import { Tabs as TabsPrimitive } from "@base-ui/react/tabs"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
+import type { ComponentMeta } from "@/lib/component-meta"
 
 function Tabs({
   className,
@@ -80,3 +81,38 @@ function TabsContent({ className, ...props }: TabsPrimitive.Panel.Props) {
 }
 
 export { Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants }
+export const meta: ComponentMeta = {
+  name: "Tabs",
+  description: "Switch between peer views within the same context, one visible at a time.",
+  category: "navigation",
+  status: "stable",
+  structure: {
+    anatomy: ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
+    parts: ["TabsList", "TabsTrigger", "TabsContent"],
+    composition: "One TabsTrigger per TabsContent, matched by value.",
+  },
+  appearance: {
+    tokens: ["muted", "background", "foreground", "muted-foreground", "ring"],
+    states: ["active tab", "inactive tab", "focus-visible"],
+  },
+  behavior: {
+    interactions: ["click tab", "arrow-key roving focus"],
+    events: ["onValueChange"],
+    controllable: true,
+  },
+  accessibility: {
+    role: "tablist / tab / tabpanel",
+    keyboard: ["Arrows move between tabs", "Tab moves into the panel"],
+    aria: ["wires aria-selected and aria-controls"],
+  },
+  aiHints: {
+    priority: 2,
+    useCases: ["A few peer views in one panel (Overview/Specs/Team)", "Settings sections"],
+    antiPatterns: [
+      { avoid: "Tabs for sequential steps", reason: "Order/progress isn't communicated.", instead: "Use a stepper/wizard." },
+      { avoid: "Too many tabs to fit", reason: "Overflow harms discoverability.", instead: "Use a Select or navigation menu." },
+    ],
+    whenNotToUse: ["Primary page navigation", "Ordered multi-step flows"],
+    pairsWith: ["Card", "Separator"],
+  },
+}

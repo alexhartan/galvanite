@@ -4,6 +4,7 @@ import * as React from "react"
 import { Select as SelectPrimitive } from "@base-ui/react/select"
 
 import { cn } from "@/lib/utils"
+import type { ComponentMeta } from "@/lib/component-meta"
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react"
 
 const Select = SelectPrimitive.Root
@@ -198,4 +199,39 @@ export {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
+}
+export const meta: ComponentMeta = {
+  name: "Select",
+  description: "Dropdown for choosing one option from a defined set.",
+  category: "forms",
+  status: "stable",
+  structure: {
+    anatomy: ["SelectTrigger", "SelectValue", "SelectContent", "SelectItem", "SelectGroup", "SelectLabel", "SelectSeparator"],
+    parts: ["SelectTrigger", "SelectValue", "SelectContent", "SelectItem", "SelectGroup", "SelectLabel", "SelectSeparator"],
+    composition: "Trigger shows the value; Content holds grouped Items in a popover.",
+  },
+  appearance: {
+    tokens: ["input", "popover", "popover-foreground", "accent", "ring", "border"],
+    states: ["closed", "open", "focus-visible", "disabled", "item-highlighted"],
+  },
+  behavior: {
+    interactions: ["open/close", "type-ahead", "arrow-key navigation", "select item"],
+    events: ["onValueChange", "onOpenChange"],
+    controllable: true,
+  },
+  accessibility: {
+    role: "combobox / listbox",
+    keyboard: ["Enter/Space opens", "Arrows move", "Esc closes", "type to jump"],
+    aria: ["manages aria-expanded / aria-activedescendant"],
+  },
+  aiHints: {
+    priority: 2,
+    useCases: ["Pick one from many predefined options", "Compact single-choice in forms"],
+    antiPatterns: [
+      { avoid: "Using Select for 2–3 visible options", reason: "Hides choices behind a click.", instead: "Use Tabs, radios, or a segmented control." },
+      { avoid: "Multi-select via Select", reason: "This control is single-value.", instead: "Use a multi-select/combobox with checkboxes." },
+    ],
+    whenNotToUse: ["Very small option sets", "Free-form entry (use Input)"],
+    pairsWith: ["Label"],
+  },
 }

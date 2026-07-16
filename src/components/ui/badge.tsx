@@ -3,6 +3,7 @@ import { useRender } from "@base-ui/react/use-render"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
+import type { ComponentMeta } from "@/lib/component-meta"
 
 const badgeVariants = cva(
   "group/badge inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3!",
@@ -50,3 +51,42 @@ function Badge({
 }
 
 export { Badge, badgeVariants }
+export const meta: ComponentMeta = {
+  name: "Badge",
+  description: "Compact non-interactive label for status, counts, or categorization.",
+  category: "data-display",
+  status: "stable",
+  structure: {
+    anatomy: ["root", "icon (optional)", "label"],
+    composition: "Render inline within headings, list rows, or CardAction.",
+  },
+  appearance: {
+    variants: ["default", "secondary", "destructive", "outline"],
+    tokens: ["primary", "secondary", "destructive", "border", "foreground"],
+    states: ["rest"],
+  },
+  behavior: {
+    interactions: [],
+    controllable: false,
+    notes: ["Decorative by default; not focusable or clickable."],
+  },
+  accessibility: {
+    role: "status (only if it conveys live state)",
+    notes: ["Keep text meaningful on its own; color is not the only signal."],
+  },
+  aiHints: {
+    priority: 3,
+    useCases: ["Show item status (New, Beta)", "Category tag", "Small count indicator"],
+    selectionCriteria: {
+      default: "Neutral/positive emphasis.",
+      secondary: "Muted, low-emphasis tag.",
+      destructive: "Error or warning status.",
+      outline: "Quiet tag on busy surfaces.",
+    },
+    antiPatterns: [
+      { avoid: "Making a Badge clickable", reason: "It has no interactive affordance or focus handling.", instead: "Use a Button (size xs) or a link." },
+    ],
+    whenNotToUse: ["For dismissible tokens use a chip/tag with a remove control"],
+    pairsWith: ["Card", "Button"],
+  },
+}

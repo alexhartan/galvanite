@@ -1,6 +1,7 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
+import type { ComponentMeta } from "@/lib/component-meta"
 
 function Card({
   className,
@@ -100,4 +101,36 @@ export {
   CardAction,
   CardDescription,
   CardContent,
+}
+export const meta: ComponentMeta = {
+  name: "Card",
+  description: "Surface container that groups related content and actions.",
+  category: "layout",
+  status: "stable",
+  structure: {
+    anatomy: ["Card", "CardHeader", "CardTitle", "CardDescription", "CardAction", "CardContent", "CardFooter"],
+    parts: ["CardHeader", "CardTitle", "CardDescription", "CardAction", "CardContent", "CardFooter"],
+    composition: "Compose header (title + description + action) over content over footer.",
+  },
+  appearance: {
+    tokens: ["card", "card-foreground", "border", "muted-foreground"],
+    states: ["rest"],
+  },
+  behavior: {
+    interactions: [],
+    controllable: false,
+    notes: ["Purely presentational; interactivity comes from children."],
+  },
+  accessibility: {
+    notes: ["Give a heading (CardTitle) so the region is identifiable; add aria-labelledby when used as a landmark."],
+  },
+  aiHints: {
+    priority: 2,
+    useCases: ["Group a form", "Summary/stat tile", "Content preview", "Settings panel"],
+    antiPatterns: [
+      { avoid: "Nesting cards several levels deep", reason: "Stacked borders/backgrounds muddy the hierarchy.", instead: "Use spacing or a Separator inside one card." },
+    ],
+    whenNotToUse: ["For full-bleed page sections that need no boundary"],
+    pairsWith: ["Button", "Input", "Tabs", "Separator", "Badge"],
+  },
 }

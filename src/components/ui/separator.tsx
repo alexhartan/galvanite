@@ -24,33 +24,50 @@ function Separator({
 }
 
 export { Separator }
+
 export const meta: ComponentMeta = {
-  name: "Separator",
-  description: "Thin rule that visually or semantically divides content.",
-  category: "layout",
-  status: "stable",
-  structure: {
-    anatomy: ["root rule"],
-    composition: "Place between groups; horizontal or vertical via orientation.",
+  component: {
+    name: "Separator",
+    category: "atoms",
+    type: "display",
+    description: "Thin rule that visually or semantically divides content.",
+    path: "src/components/ui/separator.tsx",
+    figma: { nodeId: null },
   },
-  appearance: {
-    tokens: ["border"],
-    states: ["rest"],
+  props: {
+    orientation: { type: "enum", default: "horizontal", options: ["horizontal", "vertical"] },
+    decorative: { type: "boolean", default: true, description: "When true, hidden from the a11y tree." },
+    className: { type: "string", required: false },
   },
-  behavior: {
-    interactions: [],
-    controllable: false,
+  variants: {
+    axes: { orientation: ["horizontal", "vertical"] },
+    purpose: {
+      "orientation.horizontal": "Divide stacked content.",
+      "orientation.vertical": "Divide inline items in a row/toolbar.",
+    },
   },
-  accessibility: {
-    role: "separator (decorative when aria-hidden)",
-    notes: ["Set decorative when it carries no semantic meaning."],
+  relationships: {
+    commonPartners: ["Card", "Tabs"],
+    role: "separator (or none when decorative)",
+    keyboardSupport: "Not focusable.",
+    screenReader: "Hidden when decorative; otherwise announces a separator.",
+  },
+  tokens: {
+    color: { background: "var(--border)" },
+    spacing: { thickness: "1px" },
   },
   aiHints: {
-    priority: 3,
-    useCases: ["Divide sections in a Card", "Separate a heading from a row", "Vertical divider in a toolbar"],
-    antiPatterns: [
-      { avoid: "Stacking separators to fake spacing", reason: "Spacing is a layout concern.", instead: "Use margin/gap utilities." },
-    ],
-    pairsWith: ["Card", "Tabs"],
+    priority: "low",
+    keywords: ["separator", "divider", "rule", "hr"],
+    selectionCriteria: { Separator: "Visually divide two groups of content." },
+    usage: {
+      useCases: ["Divide sections in a Card", "Separate a heading from a row", "Vertical divider in a toolbar"],
+      commonPatterns: [
+        { name: "Section divider", composition: "Separator between two stacked blocks." },
+      ],
+      antiPatterns: [
+        { scenario: "Stacking separators to fake spacing", reason: "Spacing is a layout concern.", alternative: "Use margin/gap utilities." },
+      ],
+    },
   },
 }

@@ -65,39 +65,51 @@ function TooltipContent({
 }
 
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }
+
 export const meta: ComponentMeta = {
-  name: "Tooltip",
-  description: "Transient popover that labels or explains a control on hover/focus.",
-  category: "overlay",
-  status: "stable",
-  structure: {
-    anatomy: ["TooltipProvider", "Tooltip", "TooltipTrigger", "TooltipContent"],
-    parts: ["TooltipProvider", "Tooltip", "TooltipTrigger", "TooltipContent"],
-    composition: "Wrap the app/subtree in TooltipProvider; Trigger renders the target element.",
+  component: {
+    name: "Tooltip",
+    category: "molecules",
+    type: "display",
+    description: "Transient popover that labels or explains a control on hover/focus.",
+    path: "src/components/ui/tooltip.tsx",
+    figma: { nodeId: null },
   },
-  appearance: {
-    tokens: ["popover", "popover-foreground", "primary", "primary-foreground"],
-    states: ["hidden", "delayed-open", "open"],
+  props: {
+    delayDuration: { type: "number", required: false, description: "Open delay in ms." },
+    open: { type: "boolean", required: false, description: "Controlled open state." },
+    onOpenChange: { type: "(open: boolean) => void", required: false },
   },
-  behavior: {
-    interactions: ["hover", "focus", "Esc to dismiss"],
-    events: ["onOpenChange"],
-    controllable: true,
-    notes: ["Opens after a short delay; content must be non-essential."],
-  },
-  accessibility: {
+  variants: { axes: {}, purpose: {} },
+  relationships: {
+    requires: ["TooltipProvider", "TooltipTrigger", "TooltipContent"],
+    mustBeChildOf: ["TooltipProvider"],
+    mustBeParentOf: ["TooltipTrigger", "TooltipContent"],
+    commonPartners: ["Button"],
     role: "tooltip",
-    keyboard: ["Focus reveals", "Esc dismisses"],
-    aria: ["links trigger and content via aria-describedby"],
-    notes: ["Never put interactive elements inside; not shown on touch."],
+    keyboardSupport: "Focus reveals; Esc dismisses.",
+    screenReader: "Linked to the trigger via aria-describedby; not shown on touch.",
+  },
+  tokens: {
+    color: { background: "var(--popover)", foreground: "var(--popover-foreground)" },
+    border: { radius: "var(--radius-md)" },
+    motion: { open: "fade + scale in" },
   },
   aiHints: {
-    priority: 3,
-    useCases: ["Name an icon-only Button", "Explain a terse label", "Reveal a shortcut"],
-    antiPatterns: [
-      { avoid: "Putting essential info or actions only in a Tooltip", reason: "Unavailable on touch and to some AT.", instead: "Show inline, or use a Popover for interactive content." },
-    ],
-    whenNotToUse: ["Rich/interactive content (use Popover)", "Long-form help"],
-    pairsWith: ["Button"],
+    priority: "low",
+    keywords: ["tooltip", "hint", "hover", "label", "help"],
+    selectionCriteria: {
+      Tooltip: "Non-essential label/explanation on hover or focus.",
+      Popover: "Use instead for interactive or essential content.",
+    },
+    usage: {
+      useCases: ["Name an icon-only Button", "Explain a terse label", "Reveal a shortcut"],
+      commonPatterns: [
+        { name: "Icon button label", composition: "TooltipTrigger renders a Button size=icon; TooltipContent holds the name." },
+      ],
+      antiPatterns: [
+        { scenario: "Essential info or actions only in a Tooltip", reason: "Unavailable on touch and to some AT.", alternative: "Show inline, or use a Popover for interactive content." },
+      ],
+    },
   },
 }

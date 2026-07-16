@@ -1,9 +1,9 @@
 import {
-  Boxes,
-  Ear,
   Palette,
+  Share2,
+  Shapes,
+  SlidersHorizontal,
   Sparkles,
-  Zap,
   type LucideIcon,
 } from "lucide-react";
 
@@ -16,58 +16,29 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { PILLARS, type ComponentMeta, type Pillar } from "@/lib/component-meta";
+import type { ComponentMeta } from "@/lib/component-meta";
 
-const PILLAR_META: Record<
-  Pillar,
-  { label: string; icon: LucideIcon; blurb: string }
-> = {
-  structure: { label: "Structure", icon: Boxes, blurb: "Anatomy & composition" },
-  appearance: { label: "Appearance", icon: Palette, blurb: "Variants & tokens" },
-  behavior: { label: "Behavior", icon: Zap, blurb: "Interaction & state" },
-  accessibility: { label: "Accessibility", icon: Ear, blurb: "Role, keyboard, ARIA" },
-};
+/* ---------------------------------------------------------------- helpers */
 
 function titleize(key: string) {
   return key
     .replace(/([A-Z])/g, " $1")
-    .replace(/^./, (c) => c.toUpperCase());
+    .replace(/[._]/g, " ")
+    .replace(/^./, (c) => c.toUpperCase())
+    .trim();
 }
 
-/** Render one field of a pillar (string | boolean | string[]). */
-function Field({ label, value }: { label: string; value: unknown }) {
-  if (value == null || (Array.isArray(value) && value.length === 0)) return null;
-
-  return (
-    <div className="space-y-1.5">
-      <div className="text-xs font-medium tracking-wide text-brand-blue7 uppercase">
-        {titleize(label)}
-      </div>
-      {Array.isArray(value) ? (
-        <div className="flex flex-wrap gap-1.5">
-          {value.map((v) => (
-            <Badge key={String(v)} variant="outline" className="font-normal">
-              {String(v)}
-            </Badge>
-          ))}
-        </div>
-      ) : typeof value === "boolean" ? (
-        <div className="text-sm text-foreground">{value ? "Yes" : "No"}</div>
-      ) : (
-        <div className="text-sm text-muted-foreground">{String(value)}</div>
-      )}
-    </div>
-  );
-}
-
-function PillarBlock({
-  pillar,
-  data,
+function PillarShell({
+  icon: Icon,
+  label,
+  blurb,
+  children,
 }: {
-  pillar: Pillar;
-  data: Record<string, unknown>;
+  icon: LucideIcon;
+  label: string;
+  blurb: string;
+  children: React.ReactNode;
 }) {
-  const { label, icon: Icon, blurb } = PILLAR_META[pillar];
   return (
     <div className="rounded-lg border border-border bg-background/40 p-4 space-y-4">
       <div className="flex items-start gap-3">
@@ -79,99 +50,312 @@ function PillarBlock({
           <div className="text-xs text-muted-foreground">{blurb}</div>
         </div>
       </div>
-      <div className="space-y-3">
-        {Object.entries(data).map(([k, v]) => (
-          <Field key={k} label={k} value={v} />
+      <div className="space-y-4">{children}</div>
+    </div>
+  );
+}
+
+function FieldLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="text-xs font-medium tracking-wide text-brand-blue7 uppercase">
+      {children}
+    </div>
+  );
+}
+
+function ChipList({ label, items }: { label: string; items?: readonly string[] }) {
+  if (!items || items.length === 0) return null;
+  return (
+    <div className="space-y-1.5">
+      <FieldLabel>{titleize(label)}</FieldLabel>
+      <div className="flex flex-wrap gap-1.5">
+        {items.map((v) => (
+          <Badge key={v} variant="outline" className="font-normal">
+            {v}
+          </Badge>
         ))}
       </div>
     </div>
   );
 }
 
+/* ------------------------------------------------------------- pillar: props */
+
+function PropsPillar({ props }: { props: ComponentMeta["props"] }) {
+  const entries = Object.entries(props);
+  return (
+    <PillarShell icon={SlidersHorizontal} label="Props" blurb="Component API">
+      {entries.length === 0 ? (
+        <div className="text-sm text-muted-foreground">No configurable props.</div>
+      ) : (
+        <div className="space-y-3">
+          {entries.map(([name, def]) => (
+            <div key={name} className="space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <code className="text-sm text-foreground">{name}</code>
+                <Badge variant="secondary" className="font-normal">
+                  {def.type}
+                </Badge>
+                {def.required && (
+                  <span className="text-xs text-destructive">required</span>
+                )}
+                {def.default !== undefined && (
+                  <span className="text-xs text-muted-foreground">
+                    = {String(def.default)}
+                  </span>
+                )}
+              </div>
+              {def.description && (
+                <div className="text-sm text-muted-foreground">{def.description}</div>
+              )}
+              {def.options && (
+                <div className="flex flex-wrap gap-1">
+                  {def.options.map((o) => (
+                    <Badge key={o} variant="outline" className="font-normal text-xs">
+                      {o}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </PillarShell>
+  );
+}
+
+/* ---------------------------------------------------------- pillar: variants */
+
+function VariantsPillar({ variants }: { variants: ComponentMeta["variants"] }) {
+  const axes = Object.entries(variants.axes);
+  const purpose = Object.entries(variants.purpose);
+  const empty = axes.length === 0 && purpose.length === 0;
+  return (
+    <PillarShell icon={Shapes} label="Variants" blurb="Axes & purpose">
+      {empty ? (
+        <div className="text-sm text-muted-foreground">Single, non-variant component.</div>
+      ) : (
+        <>
+          {axes.map(([axis, values]) => (
+            <ChipList key={axis} label={axis} items={values} />
+          ))}
+          {purpose.length > 0 && (
+            <div className="space-y-1.5">
+              <FieldLabel>Purpose</FieldLabel>
+              <ul className="space-y-1">
+                {purpose.map(([key, text]) => (
+                  <li key={key} className="text-sm text-muted-foreground">
+                    <code className="text-foreground">{key}</code> — {text}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {variants.invalidCombinations?.length ? (
+            <div className="space-y-1.5">
+              <FieldLabel>Invalid combinations</FieldLabel>
+              <ul className="space-y-1">
+                {variants.invalidCombinations.map((c, i) => (
+                  <li key={i} className="text-sm">
+                    <span className="text-foreground">
+                      {Object.entries(c.axes)
+                        .map(([a, v]) => `${a}=${v}`)
+                        .join(" + ")}
+                    </span>{" "}
+                    <span className="text-muted-foreground">— {c.reason}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </>
+      )}
+    </PillarShell>
+  );
+}
+
+/* ----------------------------------------------------- pillar: relationships */
+
+function RelationshipsPillar({
+  rel,
+}: {
+  rel: ComponentMeta["relationships"];
+}) {
+  return (
+    <PillarShell icon={Share2} label="Relationships" blurb="Composition & a11y">
+      <ChipList label="requires" items={rel.requires} />
+      <ChipList label="mustBeChildOf" items={rel.mustBeChildOf} />
+      <ChipList label="mustBeParentOf" items={rel.mustBeParentOf} />
+      <ChipList label="optionalSibling" items={rel.optionalSibling} />
+      <ChipList label="commonPartners" items={rel.commonPartners} />
+      <ChipList label="triggers" items={rel.triggers} />
+      <ChipList label="exposesState" items={rel.exposesState} />
+      {rel.blocksWhen?.length ? (
+        <div className="space-y-1.5">
+          <FieldLabel>Blocks when</FieldLabel>
+          <ul className="space-y-1">
+            {rel.blocksWhen.map((b, i) => (
+              <li key={i} className="text-sm text-muted-foreground">
+                {b.when} → {b.effect}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+      <div className="space-y-2 rounded-md border border-border/60 bg-muted/30 p-3">
+        <div className="text-sm">
+          <span className="text-brand-blue7">role:</span>{" "}
+          <span className="text-foreground">{rel.role}</span>
+        </div>
+        <div className="text-sm">
+          <span className="text-brand-blue7">keyboard:</span>{" "}
+          <span className="text-muted-foreground">{rel.keyboardSupport}</span>
+        </div>
+        <div className="text-sm">
+          <span className="text-brand-blue7">screen reader:</span>{" "}
+          <span className="text-muted-foreground">{rel.screenReader}</span>
+        </div>
+      </div>
+    </PillarShell>
+  );
+}
+
+/* ------------------------------------------------------------ pillar: tokens */
+
+function TokensPillar({ tokens }: { tokens: ComponentMeta["tokens"] }) {
+  const groups = Object.entries(tokens).filter(
+    ([, v]) => v && Object.keys(v).length > 0,
+  ) as [string, Record<string, string>][];
+  return (
+    <PillarShell icon={Palette} label="Tokens" blurb="Themeable values">
+      {groups.length === 0 ? (
+        <div className="text-sm text-muted-foreground">Inherits ambient tokens.</div>
+      ) : (
+        groups.map(([group, vals]) => (
+          <div key={group} className="space-y-1.5">
+            <FieldLabel>{group}</FieldLabel>
+            <div className="space-y-1">
+              {Object.entries(vals).map(([k, v]) => (
+                <div key={k} className="flex items-center gap-2 text-sm">
+                  {v.startsWith("var(") || v.startsWith("#") ? (
+                    <span
+                      className="size-3.5 shrink-0 rounded-sm border border-border"
+                      style={{ background: v }}
+                    />
+                  ) : null}
+                  <code className="text-muted-foreground">{k}</code>
+                  <span className="text-foreground/70">{v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))
+      )}
+    </PillarShell>
+  );
+}
+
+/* ------------------------------------------------------------------ aiHints */
+
 function AiHints({ hints }: { hints: ComponentMeta["aiHints"] }) {
+  const priorityTone =
+    hints.priority === "high"
+      ? "default"
+      : hints.priority === "medium"
+        ? "secondary"
+        : "outline";
   return (
     <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 space-y-4">
       <div className="flex items-center gap-2">
         <Sparkles className="size-4 text-primary" />
         <span className="font-medium text-foreground">aiHints</span>
-        {typeof hints.priority === "number" && (
-          <Badge className="ml-auto">priority {hints.priority}</Badge>
-        )}
+        <Badge variant={priorityTone} className="ml-auto font-normal">
+          priority: {hints.priority}
+        </Badge>
       </div>
 
-      <Field label="useCases" value={hints.useCases} />
+      <ChipList label="keywords" items={hints.keywords} />
 
-      {hints.selectionCriteria && (
+      <div className="space-y-1.5">
+        <FieldLabel>Selection criteria</FieldLabel>
+        <ul className="space-y-1">
+          {Object.entries(hints.selectionCriteria).map(([k, when]) => (
+            <li key={k} className="text-sm text-muted-foreground">
+              <code className="text-foreground">{k}</code> — {when}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <ChipList label="use cases" items={hints.usage.useCases} />
+
+      {hints.usage.commonPatterns.length > 0 && (
         <div className="space-y-1.5">
-          <div className="text-xs font-medium tracking-wide text-brand-blue7 uppercase">
-            Selection Criteria
-          </div>
+          <FieldLabel>Common patterns</FieldLabel>
           <ul className="space-y-1">
-            {Object.entries(hints.selectionCriteria).map(([variant, when]) => (
-              <li key={variant} className="text-sm text-muted-foreground">
-                <code className="text-foreground">{variant}</code> — {when}
+            {hints.usage.commonPatterns.map((p) => (
+              <li key={p.name} className="text-sm">
+                <span className="text-foreground">{p.name}:</span>{" "}
+                <span className="text-muted-foreground">{p.composition}</span>
               </li>
             ))}
           </ul>
         </div>
       )}
 
-      {hints.antiPatterns && hints.antiPatterns.length > 0 && (
+      {hints.usage.antiPatterns.length > 0 && (
         <div className="space-y-1.5">
-          <div className="text-xs font-medium tracking-wide text-destructive uppercase">
-            Anti-patterns
-          </div>
+          <FieldLabel>
+            <span className="text-destructive">Anti-patterns</span>
+          </FieldLabel>
           <ul className="space-y-2">
-            {hints.antiPatterns.map((ap) => (
-              <li key={ap.avoid} className="text-sm">
-                <span className="text-foreground">Avoid:</span>{" "}
-                <span className="text-muted-foreground">{ap.avoid}.</span>{" "}
+            {hints.usage.antiPatterns.map((ap) => (
+              <li key={ap.scenario} className="text-sm">
+                <span className="text-foreground">{ap.scenario}.</span>{" "}
                 <span className="text-muted-foreground">{ap.reason}</span>{" "}
-                <span className="text-brand-chalk">Instead: {ap.instead}</span>
+                <span className="text-brand-chalk">Instead: {ap.alternative}</span>
               </li>
             ))}
           </ul>
         </div>
       )}
-
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Field label="whenNotToUse" value={hints.whenNotToUse} />
-        <Field label="pairsWith" value={hints.pairsWith} />
-      </div>
     </div>
   );
 }
 
+/* -------------------------------------------------------------------- panel */
+
 /**
  * Output component — renders a ComponentMeta as the four pillars
- * (Structure · Appearance · Behavior · Accessibility) plus aiHints.
+ * (Props · Variants · Relationships · Tokens) plus aiHints.
  */
 export function ComponentMetaPanel({ meta }: { meta: ComponentMeta }) {
+  const { component } = meta;
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          {meta.name}
-          {meta.status && (
-            <Badge variant="secondary" className="font-normal">
-              {meta.status}
-            </Badge>
-          )}
+        <CardTitle className="flex flex-wrap items-center gap-2">
+          {component.name}
+          <Badge variant="secondary" className="font-normal">
+            {component.category}
+          </Badge>
+          <Badge variant="outline" className="font-normal">
+            {component.type}
+          </Badge>
         </CardTitle>
-        <CardDescription>{meta.description}</CardDescription>
-        <div className="flex flex-wrap gap-1.5 pt-1">
-          <Badge variant="outline">{meta.category}</Badge>
+        <CardDescription>{component.description}</CardDescription>
+        <div className="pt-1 font-mono text-xs text-muted-foreground">
+          {component.path}
+          {component.figma?.nodeId ? ` · figma:${component.figma.nodeId}` : ""}
         </div>
       </CardHeader>
       <CardContent className="space-y-5">
         <div className="grid gap-4 md:grid-cols-2">
-          {PILLARS.map((pillar) => (
-            <PillarBlock
-              key={pillar}
-              pillar={pillar}
-              data={meta[pillar] as Record<string, unknown>}
-            />
-          ))}
+          <PropsPillar props={meta.props} />
+          <VariantsPillar variants={meta.variants} />
+          <RelationshipsPillar rel={meta.relationships} />
+          <TokensPillar tokens={meta.tokens} />
         </div>
         <Separator />
         <AiHints hints={meta.aiHints} />

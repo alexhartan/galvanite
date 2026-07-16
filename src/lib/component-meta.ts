@@ -1,107 +1,90 @@
 /**
  * Component metadata schema — the "four pillars + aiHints" framework.
  *
- * Every UI component ships a machine-readable `meta` object so that humans and
- * AI agents can reason about it: what it is (Structure), how it looks
- * (Appearance), how it acts (Behavior), and how it stays usable by everyone
- * (Accessibility) — plus `aiHints` that tell an agent when to reach for it,
- * how to pick a variant, and what never to do.
+ * Identity lives in `component`; the four descriptive pillars are
+ * `props`, `variants`, `relationships` (accessibility folded in), and
+ * `tokens`; `aiHints` carries agent-facing selection guidance.
  *
  * Attach one to each component file:
  *
  *   export const meta: ComponentMeta = { ... }
  */
 
-export type ComponentCategory =
-  | "actions"
-  | "forms"
-  | "data-display"
-  | "feedback"
-  | "layout"
-  | "navigation"
-  | "overlay";
+export type ComponentCategory = "atoms" | "molecules" | "organisms";
 
-export type ComponentStatus = "stable" | "beta" | "experimental";
+export type ComponentType =
+  | "interactive"
+  | "display"
+  | "container"
+  | "input"
+  | "navigation";
 
-/** Pillar 1 — Structure: anatomy, parts, and composition. */
-export interface StructurePillar {
-  /** The named parts / slots that make up the component. */
-  anatomy: string[];
-  /** How the component is composed or nested with others. */
-  composition?: string;
-  /** Sub-components exported from the same module. */
-  parts?: string[];
-}
-
-/** Pillar 2 — Appearance: variants, sizes, and the design tokens consumed. */
-export interface AppearancePillar {
-  variants?: string[];
-  sizes?: string[];
-  /** Semantic theme tokens the component paints with. */
-  tokens?: string[];
-  /** Visual states (rest, hover, focus, disabled, …). */
-  states?: string[];
-}
-
-/** Pillar 3 — Behavior: interaction model, events, and stateful logic. */
-export interface BehaviorPillar {
-  interactions?: string[];
-  events?: string[];
-  /** Whether the component is controllable and how. */
-  controllable?: boolean;
-  notes?: string[];
-}
-
-/** Pillar 4 — Accessibility: role, keyboard, ARIA, and focus. */
-export interface AccessibilityPillar {
-  role?: string;
-  keyboard?: string[];
-  aria?: string[];
-  notes?: string[];
-}
-
-/** An explicit thing NOT to do, why, and what to do instead. */
-export interface AntiPattern {
-  avoid: string;
-  reason: string;
-  instead: string;
-}
-
-/** Machine hints that help an agent select and use the component correctly. */
-export interface AiHints {
-  /** Relative importance when several components could fit (1 = highest). */
-  priority?: number;
-  /** Concrete situations this component is the right answer for. */
-  useCases: string[];
-  /** variant/prop → the condition under which to choose it. */
-  selectionCriteria?: Record<string, string>;
-  antiPatterns?: AntiPattern[];
-  /** Situations where a different component is a better fit. */
-  whenNotToUse?: string[];
-  /** Components this one commonly pairs with. */
-  pairsWith?: string[];
+/** A single prop's contract. */
+export interface PropDef {
+  type: string;
+  required?: boolean;
+  default?: string | number | boolean;
+  description?: string;
+  /** Allowed values for enum-like props. */
+  options?: readonly string[];
 }
 
 export interface ComponentMeta {
-  name: string;
-  description: string;
-  category: ComponentCategory;
-  status?: ComponentStatus;
-  /** Four pillars. */
-  structure: StructurePillar;
-  appearance: AppearancePillar;
-  behavior: BehaviorPillar;
-  accessibility: AccessibilityPillar;
-  /** Agent-facing guidance. */
-  aiHints: AiHints;
+  component: {
+    name: string;
+    category: ComponentCategory;
+    type: ComponentType;
+    description: string;
+    path: string;
+    figma?: { nodeId: string | null };
+  };
+
+  props: Record<string, PropDef>;
+
+  variants: {
+    /** Named axes → their allowed values (e.g. variant, size). */
+    axes: Record<string, readonly string[]>;
+    /** `${axis}.${value}` → what that value is for. */
+    purpose: Record<`${string}.${string}`, string>;
+    invalidCombinations?: { axes: Record<string, string>; reason: string }[];
+  };
+
+  relationships: {
+    requires?: string[];
+    mustBeChildOf?: string[];
+    mustBeParentOf?: string[];
+    optionalSibling?: string[];
+    commonPartners?: string[];
+    triggers?: string[];
+    blocksWhen?: { when: string; effect: string }[];
+    exposesState?: string[];
+    role: string; // a11y, folded in
+    keyboardSupport: string;
+    screenReader: string;
+  };
+
+  tokens: {
+    color?: Record<string, string>;
+    spacing?: Record<string, string>;
+    typography?: Record<string, string>;
+    border?: Record<string, string>;
+    motion?: Record<string, string>;
+    elevation?: Record<string, string>;
+  };
+
+  aiHints: {
+    priority: "high" | "medium" | "low";
+    keywords: string[];
+    selectionCriteria: Record<string, string>;
+    usage: {
+      useCases: string[];
+      commonPatterns: { name: string; composition: string }[];
+      antiPatterns: { scenario: string; reason: string; alternative: string }[];
+    };
+  };
 }
 
-/** The four pillar keys, in canonical order — handy for iteration in UI. */
-export const PILLARS = [
-  "structure",
-  "appearance",
-  "behavior",
-  "accessibility",
-] as const;
+/** The four descriptive pillars, in canonical order — handy for UI iteration. */
+export const PILLARS = ["props", "variants", "relationships", "tokens"] as const;
 
 export type Pillar = (typeof PILLARS)[number];

@@ -31,37 +31,52 @@ function Switch({
 }
 
 export { Switch }
+
 export const meta: ComponentMeta = {
-  name: "Switch",
-  description: "Toggle for a setting that takes effect immediately.",
-  category: "forms",
-  status: "stable",
-  structure: {
-    anatomy: ["track", "thumb"],
-    composition: "Pair with a Label describing the setting.",
+  component: {
+    name: "Switch",
+    category: "atoms",
+    type: "input",
+    description: "Toggle for a setting that takes effect immediately.",
+    path: "src/components/ui/switch.tsx",
+    figma: { nodeId: null },
   },
-  appearance: {
-    tokens: ["primary", "input", "background", "ring"],
-    states: ["off", "on", "focus-visible", "disabled"],
+  props: {
+    checked: { type: "boolean", required: false, description: "Controlled on/off state." },
+    defaultChecked: { type: "boolean", required: false },
+    disabled: { type: "boolean", default: false },
+    onCheckedChange: { type: "(checked: boolean) => void", required: false },
+    className: { type: "string", required: false },
   },
-  behavior: {
-    interactions: ["click", "Space/Enter to toggle"],
-    events: ["onCheckedChange"],
-    controllable: true,
-    notes: ["Implies the change applies at once — no separate save."],
-  },
-  accessibility: {
+  variants: { axes: {}, purpose: {} },
+  relationships: {
+    requires: ["Label"],
+    commonPartners: ["Label"],
+    exposesState: ["checked"],
     role: "switch",
-    keyboard: ["Space/Enter toggles", "Tab focuses"],
-    aria: ["aria-checked reflects state"],
+    keyboardSupport: "Space/Enter toggles; Tab to focus.",
+    screenReader: "aria-checked reflects state; label describes the setting.",
+  },
+  tokens: {
+    color: { track: "var(--input)", checkedTrack: "var(--primary)", thumb: "var(--background)", ring: "var(--ring)" },
+    border: { radius: "9999px" },
+    motion: { transition: "transform 150ms ease" },
   },
   aiHints: {
-    priority: 2,
-    useCases: ["Enable/disable a feature", "On/off preferences that apply instantly"],
-    antiPatterns: [
-      { avoid: "Requiring a separate Save after a Switch", reason: "Contradicts its immediate-effect affordance.", instead: "Apply on change, or use a Checkbox in a form that saves." },
-    ],
-    whenNotToUse: ["For selecting among 3+ options use Select/Tabs"],
-    pairsWith: ["Label"],
+    priority: "medium",
+    keywords: ["switch", "toggle", "setting", "on off", "enable"],
+    selectionCriteria: {
+      Switch: "Immediate-effect on/off setting.",
+      Checkbox: "Use instead inside a form that saves on submit.",
+    },
+    usage: {
+      useCases: ["Enable/disable a feature", "Instant on/off preferences"],
+      commonPatterns: [
+        { name: "Settings row", composition: "Label on the left, Switch pushed to the right with justify-between." },
+      ],
+      antiPatterns: [
+        { scenario: "Requiring a separate Save after a Switch", reason: "Contradicts its immediate-effect affordance.", alternative: "Apply on change, or use a Checkbox in a saved form." },
+      ],
+    },
   },
 }

@@ -275,7 +275,7 @@ export default function Home() {
           <p className="max-w-2xl text-muted-foreground">
             Every component ships a machine-readable{" "}
             <code className="text-foreground">meta</code> — the four pillars
-            (Structure · Appearance · Behavior · Accessibility) plus{" "}
+            (Props · Variants · Relationships · Tokens) plus{" "}
             <code className="text-foreground">aiHints</code> — so humans and
             agents can pick and use it correctly.
           </p>

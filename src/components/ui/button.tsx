@@ -61,51 +61,93 @@ function Button({
 }
 
 export { Button, buttonVariants }
+
 export const meta: ComponentMeta = {
-  name: "Button",
-  description:
-    "Primary interactive control that triggers an action or navigation. Carries the Galvanite yellow CTA as its `brand` variant.",
-  category: "actions",
-  status: "stable",
-  structure: {
-    anatomy: ["root", "leading icon (optional)", "label", "trailing icon (optional)"],
-    composition: "Icons are auto-sized; use asChild/render to render as a link or other element.",
+  component: {
+    name: "Button",
+    category: "atoms",
+    type: "interactive",
+    description:
+      "Primary interactive control that triggers an action or navigation. Carries the Galvanite yellow CTA as its `brand` variant.",
+    path: "src/components/ui/button.tsx",
+    figma: { nodeId: null },
   },
-  appearance: {
-    variants: ["default", "outline", "secondary", "ghost", "destructive", "link", "brand"],
-    sizes: ["xs", "sm", "default", "lg", "xl", "icon", "icon-sm", "icon-lg"],
-    tokens: ["primary", "primary-foreground", "secondary", "muted", "destructive", "ring", "background", "foreground"],
-    states: ["rest", "hover", "focus-visible", "active", "disabled"],
+  props: {
+    variant: {
+      type: "enum",
+      default: "default",
+      description: "Visual emphasis of the button.",
+      options: ["default", "outline", "secondary", "ghost", "destructive", "link", "brand"],
+    },
+    size: {
+      type: "enum",
+      default: "default",
+      description: "Control height / density.",
+      options: ["xs", "sm", "default", "lg", "xl", "icon", "icon-xs", "icon-sm", "icon-lg"],
+    },
+    disabled: { type: "boolean", default: false, description: "Disables interaction." },
+    render: { type: "ReactElement", required: false, description: "Render as another element (e.g. a link)." },
+    className: { type: "string", required: false, description: "Additional classes." },
+    onClick: { type: "(e: MouseEvent) => void", required: false, description: "Activation handler." },
   },
-  behavior: {
-    interactions: ["click", "keyboard activation (Enter/Space)"],
-    events: ["onClick"],
-    controllable: false,
-    notes: ["`brand` inverts yellow→deep-navy on hover with a blue glow, mirroring galvanite.io."],
+  variants: {
+    axes: {
+      variant: ["default", "outline", "secondary", "ghost", "destructive", "link", "brand"],
+      size: ["xs", "sm", "default", "lg", "xl", "icon", "icon-xs", "icon-sm", "icon-lg"],
+    },
+    purpose: {
+      "variant.brand": "The single most important CTA on a marketing/hero surface (yellow → deep-navy on hover).",
+      "variant.default": "Standard primary action inside app UI.",
+      "variant.secondary": "Alternative action shown next to a primary one.",
+      "variant.outline": "Low-emphasis action that still needs a visible boundary.",
+      "variant.ghost": "Tertiary action in toolbars or dense UI.",
+      "variant.destructive": "Irreversible or dangerous actions (delete, remove).",
+      "variant.link": "Navigation styled as inline text.",
+      "size.xl": "Oversized hero CTA.",
+      "size.icon": "Square icon-only button.",
+    },
+    invalidCombinations: [
+      { axes: { variant: "link", size: "icon" }, reason: "A text link has no icon-only affordance; use ghost + icon size." },
+    ],
   },
-  accessibility: {
+  relationships: {
+    commonPartners: ["Tooltip", "Card", "Input", "Select"],
+    triggers: ["Dialog", "Select", "Tooltip"],
     role: "button",
-    keyboard: ["Enter / Space to activate", "Tab to focus"],
-    aria: ["aria-label required for icon-only buttons", "aria-disabled reflects disabled"],
-    notes: ["Focus-visible ring uses --ring."],
+    keyboardSupport: "Tab to focus; Enter/Space to activate.",
+    screenReader: "Announced as a button by its text; icon-only buttons require aria-label.",
+  },
+  tokens: {
+    color: {
+      background: "var(--primary)",
+      foreground: "var(--primary-foreground)",
+      ring: "var(--ring)",
+      "brand.hoverBg": "var(--background)",
+      "brand.glow": "var(--color-brand-blue7)",
+    },
+    border: { radius: "var(--radius-sm)" },
+    motion: { transition: "all 200ms ease", active: "scale(0.99)" },
   },
   aiHints: {
-    priority: 1,
-    useCases: ["Submit a form", "Primary page call-to-action", "Trigger a dialog or menu", "Inline row actions"],
+    priority: "high",
+    keywords: ["button", "cta", "action", "submit", "click"],
     selectionCriteria: {
-      brand: "The single most important CTA on a marketing/hero surface.",
-      default: "Standard primary action inside app UI.",
-      secondary: "Alternative action shown next to a primary one.",
-      outline: "Low-emphasis action that still needs a visible boundary.",
-      ghost: "Tertiary action in toolbars or dense UI.",
-      destructive: "Irreversible or dangerous actions (delete, remove).",
-      link: "Navigation styled as inline text.",
+      brand: "The one hero call-to-action.",
+      default: "Standard in-app primary action.",
+      secondary: "Secondary action beside a primary.",
+      destructive: "Delete / remove / irreversible.",
+      link: "Inline text navigation.",
     },
-    antiPatterns: [
-      { avoid: "Using more than one `brand` button in a viewport", reason: "Dilutes the single-CTA hierarchy of the brand.", instead: "Pair one `brand` with `secondary`/`outline`." },
-      { avoid: "Icon-only button without a label", reason: "Screen readers announce nothing.", instead: "Add aria-label or wrap in a Tooltip with an accessible name." },
-    ],
-    whenNotToUse: ["For navigation between pages prefer a link", "For binary on/off state use Switch or Checkbox"],
-    pairsWith: ["Tooltip", "Card", "Input"],
+    usage: {
+      useCases: ["Submit a form", "Primary page CTA", "Open a dialog or menu", "Inline row actions"],
+      commonPatterns: [
+        { name: "CTA pair", composition: "One Button variant=brand next to Button variant=secondary." },
+        { name: "Icon button", composition: "Button size=icon wrapped in a Tooltip for its label." },
+      ],
+      antiPatterns: [
+        { scenario: "Multiple brand buttons in one viewport", reason: "Dilutes the single-CTA hierarchy.", alternative: "Keep one brand button; make the rest secondary/outline." },
+        { scenario: "Icon-only button without a label", reason: "Screen readers announce nothing.", alternative: "Add aria-label or wrap in a Tooltip." },
+      ],
+    },
   },
 }

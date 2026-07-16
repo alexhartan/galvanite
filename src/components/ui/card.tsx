@@ -102,35 +102,50 @@ export {
   CardDescription,
   CardContent,
 }
+
 export const meta: ComponentMeta = {
-  name: "Card",
-  description: "Surface container that groups related content and actions.",
-  category: "layout",
-  status: "stable",
-  structure: {
-    anatomy: ["Card", "CardHeader", "CardTitle", "CardDescription", "CardAction", "CardContent", "CardFooter"],
-    parts: ["CardHeader", "CardTitle", "CardDescription", "CardAction", "CardContent", "CardFooter"],
-    composition: "Compose header (title + description + action) over content over footer.",
+  component: {
+    name: "Card",
+    category: "molecules",
+    type: "container",
+    description: "Surface container that groups related content and actions.",
+    path: "src/components/ui/card.tsx",
+    figma: { nodeId: null },
   },
-  appearance: {
-    tokens: ["card", "card-foreground", "border", "muted-foreground"],
-    states: ["rest"],
+  props: {
+    className: { type: "string", required: false, description: "Additional classes on the surface." },
   },
-  behavior: {
-    interactions: [],
-    controllable: false,
-    notes: ["Purely presentational; interactivity comes from children."],
+  variants: {
+    axes: {},
+    purpose: {},
   },
-  accessibility: {
-    notes: ["Give a heading (CardTitle) so the region is identifiable; add aria-labelledby when used as a landmark."],
+  relationships: {
+    mustBeParentOf: ["CardHeader", "CardContent", "CardFooter"],
+    optionalSibling: ["CardTitle", "CardDescription", "CardAction"],
+    commonPartners: ["Button", "Input", "Tabs", "Separator", "Badge"],
+    role: "group / region (add aria-labelledby to a CardTitle for a landmark)",
+    keyboardSupport: "None itself; interactivity comes from children.",
+    screenReader: "Give a CardTitle so the region is identifiable.",
+  },
+  tokens: {
+    color: { background: "var(--card)", foreground: "var(--card-foreground)", border: "var(--border)" },
+    border: { radius: "var(--radius-xl)" },
+    spacing: { padding: "var(--radius-xl)", gap: "1.5rem" },
   },
   aiHints: {
-    priority: 2,
-    useCases: ["Group a form", "Summary/stat tile", "Content preview", "Settings panel"],
-    antiPatterns: [
-      { avoid: "Nesting cards several levels deep", reason: "Stacked borders/backgrounds muddy the hierarchy.", instead: "Use spacing or a Separator inside one card." },
-    ],
-    whenNotToUse: ["For full-bleed page sections that need no boundary"],
-    pairsWith: ["Button", "Input", "Tabs", "Separator", "Badge"],
+    priority: "medium",
+    keywords: ["card", "panel", "container", "surface", "tile"],
+    selectionCriteria: {
+      Card: "Group related content/actions behind one bordered surface.",
+    },
+    usage: {
+      useCases: ["Group a form", "Summary/stat tile", "Content preview", "Settings panel"],
+      commonPatterns: [
+        { name: "Form card", composition: "CardHeader (title + description) → CardContent (fields) → CardFooter (submit)." },
+      ],
+      antiPatterns: [
+        { scenario: "Nesting cards several levels deep", reason: "Stacked borders/backgrounds muddy hierarchy.", alternative: "Use spacing or a Separator within one card." },
+      ],
+    },
   },
 }

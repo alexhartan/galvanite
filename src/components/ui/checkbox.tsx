@@ -28,39 +28,51 @@ function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
 }
 
 export { Checkbox }
+
 export const meta: ComponentMeta = {
-  name: "Checkbox",
-  description: "Binary (or indeterminate) toggle for a single option or list item.",
-  category: "forms",
-  status: "stable",
-  structure: {
-    anatomy: ["root box", "check indicator"],
-    composition: "Pair with a Label; group several for multi-select lists.",
+  component: {
+    name: "Checkbox",
+    category: "atoms",
+    type: "input",
+    description: "Binary (or indeterminate) toggle for a single option or list item.",
+    path: "src/components/ui/checkbox.tsx",
+    figma: { nodeId: null },
   },
-  appearance: {
-    tokens: ["primary", "primary-foreground", "input", "ring", "border"],
-    states: ["unchecked", "checked", "indeterminate", "focus-visible", "disabled"],
+  props: {
+    checked: { type: "boolean | 'indeterminate'", required: false, description: "Controlled checked state." },
+    defaultChecked: { type: "boolean", required: false },
+    disabled: { type: "boolean", default: false },
+    onCheckedChange: { type: "(checked: boolean) => void", required: false },
+    className: { type: "string", required: false },
   },
-  behavior: {
-    interactions: ["click", "Space to toggle"],
-    events: ["onCheckedChange"],
-    controllable: true,
-  },
-  accessibility: {
+  variants: { axes: {}, purpose: {} },
+  relationships: {
+    requires: ["Label"],
+    commonPartners: ["Label"],
+    exposesState: ["checked", "indeterminate"],
     role: "checkbox",
-    keyboard: ["Space toggles", "Tab focuses"],
-    aria: ["aria-checked reflects state incl. mixed"],
+    keyboardSupport: "Space toggles; Tab to focus.",
+    screenReader: "aria-checked reflects state including mixed.",
+  },
+  tokens: {
+    color: { background: "var(--input)", checkedBg: "var(--primary)", checkedFg: "var(--primary-foreground)", ring: "var(--ring)" },
+    border: { radius: "var(--radius-sm)" },
   },
   aiHints: {
-    priority: 2,
-    useCases: ["Accept terms", "Multi-select from a list", "Toggle a boolean setting inline with text"],
+    priority: "medium",
+    keywords: ["checkbox", "toggle", "multi-select", "boolean", "terms"],
     selectionCriteria: {
       Checkbox: "Multiple independent options can be on at once.",
+      Switch: "Use instead for a setting that applies immediately.",
     },
-    antiPatterns: [
-      { avoid: "Using a Checkbox for an instant on/off preference", reason: "Switch communicates immediate effect better.", instead: "Use Switch for settings that apply immediately." },
-    ],
-    whenNotToUse: ["For mutually exclusive choices use radios/Select", "For immediate settings use Switch"],
-    pairsWith: ["Label"],
+    usage: {
+      useCases: ["Accept terms", "Multi-select from a list", "Boolean toggle inline with text"],
+      commonPatterns: [
+        { name: "Consent row", composition: "Checkbox + Label in a horizontal flex." },
+      ],
+      antiPatterns: [
+        { scenario: "Checkbox for an instant on/off preference", reason: "Switch signals immediate effect better.", alternative: "Use Switch for settings that apply at once." },
+      ],
+    },
   },
 }

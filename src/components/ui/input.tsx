@@ -19,38 +19,56 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
 }
 
 export { Input }
+
 export const meta: ComponentMeta = {
-  name: "Input",
-  description: "Single-line text field for short free-form entry.",
-  category: "forms",
-  status: "stable",
-  structure: {
-    anatomy: ["root input"],
-    composition: "Pair with a Label via htmlFor/id; group inside a form field wrapper.",
+  component: {
+    name: "Input",
+    category: "atoms",
+    type: "input",
+    description: "Single-line text field for short free-form entry.",
+    path: "src/components/ui/input.tsx",
+    figma: { nodeId: null },
   },
-  appearance: {
-    tokens: ["input", "background", "foreground", "muted-foreground", "ring", "destructive"],
-    states: ["rest", "focus-visible", "disabled", "invalid"],
+  props: {
+    type: { type: "string", default: "text", description: "Native input type (text, email, number, …)." },
+    placeholder: { type: "string", required: false },
+    disabled: { type: "boolean", default: false },
+    value: { type: "string", required: false, description: "Controlled value." },
+    defaultValue: { type: "string", required: false },
+    "aria-invalid": { type: "boolean", required: false, description: "Toggles the error ring." },
+    onChange: { type: "(e: ChangeEvent) => void", required: false },
+    className: { type: "string", required: false },
   },
-  behavior: {
-    interactions: ["type", "focus", "blur"],
-    events: ["onChange", "onFocus", "onBlur"],
-    controllable: true,
-    notes: ["Supports controlled and uncontrolled use; type=email/number/etc."],
-  },
-  accessibility: {
+  variants: { axes: {}, purpose: {} },
+  relationships: {
+    requires: ["Label"],
+    commonPartners: ["Label", "Button"],
+    exposesState: ["value", "focused", "invalid"],
     role: "textbox",
-    keyboard: ["Standard text-editing keys"],
-    aria: ["aria-invalid toggles the error ring", "associate a Label or aria-label"],
+    keyboardSupport: "Standard text editing keys; Tab to focus.",
+    screenReader: "Needs an associated Label or aria-label; aria-invalid announces errors.",
+  },
+  tokens: {
+    color: { background: "var(--background)", foreground: "var(--foreground)", border: "var(--input)", ring: "var(--ring)", invalid: "var(--destructive)" },
+    border: { radius: "var(--radius-md)" },
   },
   aiHints: {
-    priority: 1,
-    useCases: ["Name/email/short text", "Search box", "Numeric entry"],
-    antiPatterns: [
-      { avoid: "Placeholder used as the only label", reason: "It disappears on input and fails a11y.", instead: "Always pair with a visible Label." },
-      { avoid: "Multi-line content in an Input", reason: "Text is clipped to one line.", instead: "Use Textarea." },
-    ],
-    whenNotToUse: ["For long text use Textarea", "For a fixed choice set use Select"],
-    pairsWith: ["Label", "Button"],
+    priority: "high",
+    keywords: ["input", "text field", "field", "form", "email", "search"],
+    selectionCriteria: {
+      Input: "Short single-line value.",
+      Textarea: "Use instead for multi-line content.",
+      Select: "Use instead for a fixed set of choices.",
+    },
+    usage: {
+      useCases: ["Name/email/short text", "Search box", "Numeric entry"],
+      commonPatterns: [
+        { name: "Labeled field", composition: "Label htmlFor=id + Input id=id inside a spaced wrapper." },
+      ],
+      antiPatterns: [
+        { scenario: "Placeholder used as the only label", reason: "It disappears on input and fails a11y.", alternative: "Always pair with a visible Label." },
+        { scenario: "Multi-line content in an Input", reason: "Text is clipped to one line.", alternative: "Use Textarea." },
+      ],
+    },
   },
 }

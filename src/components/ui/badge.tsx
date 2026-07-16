@@ -51,42 +51,62 @@ function Badge({
 }
 
 export { Badge, badgeVariants }
+
 export const meta: ComponentMeta = {
-  name: "Badge",
-  description: "Compact non-interactive label for status, counts, or categorization.",
-  category: "data-display",
-  status: "stable",
-  structure: {
-    anatomy: ["root", "icon (optional)", "label"],
-    composition: "Render inline within headings, list rows, or CardAction.",
+  component: {
+    name: "Badge",
+    category: "atoms",
+    type: "display",
+    description: "Compact non-interactive label for status, counts, or categorization.",
+    path: "src/components/ui/badge.tsx",
+    figma: { nodeId: null },
   },
-  appearance: {
-    variants: ["default", "secondary", "destructive", "outline"],
-    tokens: ["primary", "secondary", "destructive", "border", "foreground"],
-    states: ["rest"],
+  props: {
+    variant: {
+      type: "enum",
+      default: "default",
+      description: "Emphasis / semantic tone.",
+      options: ["default", "secondary", "destructive", "outline"],
+    },
+    className: { type: "string", required: false },
   },
-  behavior: {
-    interactions: [],
-    controllable: false,
-    notes: ["Decorative by default; not focusable or clickable."],
+  variants: {
+    axes: { variant: ["default", "secondary", "destructive", "outline"] },
+    purpose: {
+      "variant.default": "Neutral/positive emphasis.",
+      "variant.secondary": "Muted, low-emphasis tag.",
+      "variant.destructive": "Error or warning status.",
+      "variant.outline": "Quiet tag on busy surfaces.",
+    },
   },
-  accessibility: {
-    role: "status (only if it conveys live state)",
-    notes: ["Keep text meaningful on its own; color is not the only signal."],
+  relationships: {
+    commonPartners: ["Card", "Button"],
+    mustBeChildOf: [],
+    role: "status (only when it conveys live state, otherwise none)",
+    keyboardSupport: "Not focusable; decorative.",
+    screenReader: "Read as text; keep the label meaningful without color.",
+  },
+  tokens: {
+    color: { background: "var(--primary)", foreground: "var(--primary-foreground)", border: "var(--border)" },
+    border: { radius: "var(--radius-md)" },
+    typography: { size: "0.75rem", weight: "500" },
   },
   aiHints: {
-    priority: 3,
-    useCases: ["Show item status (New, Beta)", "Category tag", "Small count indicator"],
+    priority: "low",
+    keywords: ["badge", "tag", "status", "chip", "label", "count"],
     selectionCriteria: {
-      default: "Neutral/positive emphasis.",
-      secondary: "Muted, low-emphasis tag.",
-      destructive: "Error or warning status.",
-      outline: "Quiet tag on busy surfaces.",
+      default: "Neutral/positive status.",
+      destructive: "Error / warning.",
+      outline: "Low-emphasis tag.",
     },
-    antiPatterns: [
-      { avoid: "Making a Badge clickable", reason: "It has no interactive affordance or focus handling.", instead: "Use a Button (size xs) or a link." },
-    ],
-    whenNotToUse: ["For dismissible tokens use a chip/tag with a remove control"],
-    pairsWith: ["Card", "Button"],
+    usage: {
+      useCases: ["Show item status (New, Beta)", "Category tag", "Small count indicator"],
+      commonPatterns: [
+        { name: "Card status", composition: "Badge inside CardAction to flag a card." },
+      ],
+      antiPatterns: [
+        { scenario: "Making a Badge clickable", reason: "It has no interactive affordance or focus handling.", alternative: "Use a Button size=xs or a link." },
+      ],
+    },
   },
 }

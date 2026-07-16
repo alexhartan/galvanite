@@ -17,35 +17,53 @@ function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
 }
 
 export { Textarea }
+
 export const meta: ComponentMeta = {
-  name: "Textarea",
-  description: "Multi-line text field for longer free-form entry.",
-  category: "forms",
-  status: "stable",
-  structure: {
-    anatomy: ["root textarea"],
-    composition: "Pair with a Label; grows to fit content per field styling.",
+  component: {
+    name: "Textarea",
+    category: "atoms",
+    type: "input",
+    description: "Multi-line text field for longer free-form entry.",
+    path: "src/components/ui/textarea.tsx",
+    figma: { nodeId: null },
   },
-  appearance: {
-    tokens: ["input", "background", "foreground", "muted-foreground", "ring", "destructive"],
-    states: ["rest", "focus-visible", "disabled", "invalid"],
+  props: {
+    placeholder: { type: "string", required: false },
+    disabled: { type: "boolean", default: false },
+    rows: { type: "number", required: false },
+    value: { type: "string", required: false, description: "Controlled value." },
+    "aria-invalid": { type: "boolean", required: false },
+    onChange: { type: "(e: ChangeEvent) => void", required: false },
+    className: { type: "string", required: false },
   },
-  behavior: {
-    interactions: ["type", "focus", "blur", "resize"],
-    events: ["onChange", "onFocus", "onBlur"],
-    controllable: true,
-  },
-  accessibility: {
+  variants: { axes: {}, purpose: {} },
+  relationships: {
+    requires: ["Label"],
+    commonPartners: ["Label", "Button"],
+    exposesState: ["value", "focused", "invalid"],
     role: "textbox (multiline)",
-    aria: ["associate a Label or aria-label", "aria-invalid toggles the error ring"],
+    keyboardSupport: "Standard text editing; Enter inserts a newline.",
+    screenReader: "Needs an associated Label or aria-label.",
+  },
+  tokens: {
+    color: { background: "var(--background)", foreground: "var(--foreground)", border: "var(--input)", ring: "var(--ring)", invalid: "var(--destructive)" },
+    border: { radius: "var(--radius-md)" },
   },
   aiHints: {
-    priority: 2,
-    useCases: ["Messages/comments", "Descriptions", "Any content over one line"],
-    antiPatterns: [
-      { avoid: "Using Textarea for a single short value", reason: "Over-sized target for one line.", instead: "Use Input." },
-    ],
-    whenNotToUse: ["For rich text use a dedicated editor"],
-    pairsWith: ["Label", "Button"],
+    priority: "medium",
+    keywords: ["textarea", "multiline", "message", "description", "comment"],
+    selectionCriteria: {
+      Textarea: "Content that can exceed one line.",
+      Input: "Use instead for a single short value.",
+    },
+    usage: {
+      useCases: ["Messages/comments", "Descriptions", "Any content over one line"],
+      commonPatterns: [
+        { name: "Labeled area", composition: "Label + Textarea inside a form field wrapper." },
+      ],
+      antiPatterns: [
+        { scenario: "Using Textarea for a single short value", reason: "Over-sized target for one line.", alternative: "Use Input." },
+      ],
+    },
   },
 }

@@ -200,38 +200,53 @@ export {
   SelectTrigger,
   SelectValue,
 }
+
 export const meta: ComponentMeta = {
-  name: "Select",
-  description: "Dropdown for choosing one option from a defined set.",
-  category: "forms",
-  status: "stable",
-  structure: {
-    anatomy: ["SelectTrigger", "SelectValue", "SelectContent", "SelectItem", "SelectGroup", "SelectLabel", "SelectSeparator"],
-    parts: ["SelectTrigger", "SelectValue", "SelectContent", "SelectItem", "SelectGroup", "SelectLabel", "SelectSeparator"],
-    composition: "Trigger shows the value; Content holds grouped Items in a popover.",
+  component: {
+    name: "Select",
+    category: "molecules",
+    type: "input",
+    description: "Dropdown for choosing one option from a defined set.",
+    path: "src/components/ui/select.tsx",
+    figma: { nodeId: null },
   },
-  appearance: {
-    tokens: ["input", "popover", "popover-foreground", "accent", "ring", "border"],
-    states: ["closed", "open", "focus-visible", "disabled", "item-highlighted"],
+  props: {
+    value: { type: "string", required: false, description: "Controlled selected value." },
+    defaultValue: { type: "string", required: false },
+    disabled: { type: "boolean", default: false },
+    onValueChange: { type: "(value: string) => void", required: false },
   },
-  behavior: {
-    interactions: ["open/close", "type-ahead", "arrow-key navigation", "select item"],
-    events: ["onValueChange", "onOpenChange"],
-    controllable: true,
+  variants: { axes: {}, purpose: {} },
+  relationships: {
+    requires: ["SelectTrigger", "SelectContent", "SelectItem"],
+    mustBeParentOf: ["SelectTrigger", "SelectContent"],
+    optionalSibling: ["Label"],
+    commonPartners: ["Label"],
+    exposesState: ["value", "open"],
+    role: "combobox (trigger) / listbox (content)",
+    keyboardSupport: "Enter/Space opens; Arrows move; type-ahead; Esc closes.",
+    screenReader: "Manages aria-expanded and aria-activedescendant.",
   },
-  accessibility: {
-    role: "combobox / listbox",
-    keyboard: ["Enter/Space opens", "Arrows move", "Esc closes", "type to jump"],
-    aria: ["manages aria-expanded / aria-activedescendant"],
+  tokens: {
+    color: { trigger: "var(--input)", popover: "var(--popover)", popoverFg: "var(--popover-foreground)", highlight: "var(--accent)", ring: "var(--ring)" },
+    border: { radius: "var(--radius-md)" },
   },
   aiHints: {
-    priority: 2,
-    useCases: ["Pick one from many predefined options", "Compact single-choice in forms"],
-    antiPatterns: [
-      { avoid: "Using Select for 2–3 visible options", reason: "Hides choices behind a click.", instead: "Use Tabs, radios, or a segmented control." },
-      { avoid: "Multi-select via Select", reason: "This control is single-value.", instead: "Use a multi-select/combobox with checkboxes." },
-    ],
-    whenNotToUse: ["Very small option sets", "Free-form entry (use Input)"],
-    pairsWith: ["Label"],
+    priority: "medium",
+    keywords: ["select", "dropdown", "combobox", "picker", "choice"],
+    selectionCriteria: {
+      Select: "Pick one from many predefined options.",
+      Tabs: "Use instead for 2–4 always-visible peer views.",
+    },
+    usage: {
+      useCases: ["Choose one from many options", "Compact single-choice in forms"],
+      commonPatterns: [
+        { name: "Labeled select", composition: "Label + Select(Trigger/Value + Content/Items)." },
+      ],
+      antiPatterns: [
+        { scenario: "Select for 2–3 options", reason: "Hides choices behind a click.", alternative: "Use Tabs or radios." },
+        { scenario: "Multi-select via Select", reason: "This control is single-value.", alternative: "Use a multi-select/combobox with checkboxes." },
+      ],
+    },
   },
 }

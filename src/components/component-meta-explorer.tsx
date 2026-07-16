@@ -22,7 +22,7 @@ export function ComponentMetaExplorer() {
       <TabsList>
         {ENTRIES.map((e) => (
           <TabsTrigger key={e.value} value={e.value}>
-            {e.meta.name}
+            {e.meta.component.name}
           </TabsTrigger>
         ))}
       </TabsList>

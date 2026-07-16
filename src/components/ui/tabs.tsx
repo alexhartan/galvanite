@@ -81,38 +81,58 @@ function TabsContent({ className, ...props }: TabsPrimitive.Panel.Props) {
 }
 
 export { Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants }
+
 export const meta: ComponentMeta = {
-  name: "Tabs",
-  description: "Switch between peer views within the same context, one visible at a time.",
-  category: "navigation",
-  status: "stable",
-  structure: {
-    anatomy: ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
-    parts: ["TabsList", "TabsTrigger", "TabsContent"],
-    composition: "One TabsTrigger per TabsContent, matched by value.",
+  component: {
+    name: "Tabs",
+    category: "molecules",
+    type: "navigation",
+    description: "Switch between peer views within the same context, one visible at a time.",
+    path: "src/components/ui/tabs.tsx",
+    figma: { nodeId: null },
   },
-  appearance: {
-    tokens: ["muted", "background", "foreground", "muted-foreground", "ring"],
-    states: ["active tab", "inactive tab", "focus-visible"],
+  props: {
+    value: { type: "string", required: false, description: "Controlled active tab value." },
+    defaultValue: { type: "string", required: false },
+    onValueChange: { type: "(value: string) => void", required: false },
+    orientation: { type: "enum", default: "horizontal", options: ["horizontal", "vertical"] },
   },
-  behavior: {
-    interactions: ["click tab", "arrow-key roving focus"],
-    events: ["onValueChange"],
-    controllable: true,
+  variants: {
+    axes: { orientation: ["horizontal", "vertical"] },
+    purpose: {
+      "orientation.horizontal": "Default tab strip above the panel.",
+      "orientation.vertical": "Tab list stacked beside the panel.",
+    },
   },
-  accessibility: {
+  relationships: {
+    requires: ["TabsList", "TabsTrigger", "TabsContent"],
+    mustBeParentOf: ["TabsList", "TabsContent"],
+    commonPartners: ["Card", "Separator"],
+    exposesState: ["value"],
     role: "tablist / tab / tabpanel",
-    keyboard: ["Arrows move between tabs", "Tab moves into the panel"],
-    aria: ["wires aria-selected and aria-controls"],
+    keyboardSupport: "Arrows move between tabs; Tab moves into the panel.",
+    screenReader: "Wires aria-selected and aria-controls.",
+  },
+  tokens: {
+    color: { list: "var(--muted)", active: "var(--background)", inactive: "var(--muted-foreground)", ring: "var(--ring)" },
+    border: { radius: "var(--radius-lg)" },
   },
   aiHints: {
-    priority: 2,
-    useCases: ["A few peer views in one panel (Overview/Specs/Team)", "Settings sections"],
-    antiPatterns: [
-      { avoid: "Tabs for sequential steps", reason: "Order/progress isn't communicated.", instead: "Use a stepper/wizard." },
-      { avoid: "Too many tabs to fit", reason: "Overflow harms discoverability.", instead: "Use a Select or navigation menu." },
-    ],
-    whenNotToUse: ["Primary page navigation", "Ordered multi-step flows"],
-    pairsWith: ["Card", "Separator"],
+    priority: "medium",
+    keywords: ["tabs", "segmented", "views", "sections", "navigation"],
+    selectionCriteria: {
+      Tabs: "A few peer views in one panel.",
+      Select: "Use instead when there are too many views to fit.",
+    },
+    usage: {
+      useCases: ["Peer views in one panel (Overview/Specs/Team)", "Settings sections"],
+      commonPatterns: [
+        { name: "Panel switcher", composition: "TabsList of TabsTrigger over matching TabsContent panels." },
+      ],
+      antiPatterns: [
+        { scenario: "Tabs for sequential steps", reason: "Order/progress is not communicated.", alternative: "Use a stepper/wizard." },
+        { scenario: "Too many tabs to fit", reason: "Overflow harms discoverability.", alternative: "Use a Select or nav menu." },
+      ],
+    },
   },
 }

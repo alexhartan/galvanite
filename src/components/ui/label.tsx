@@ -19,32 +19,44 @@ function Label({ className, ...props }: React.ComponentProps<"label">) {
 }
 
 export { Label }
+
 export const meta: ComponentMeta = {
-  name: "Label",
-  description: "Accessible caption that names a form control.",
-  category: "forms",
-  status: "stable",
-  structure: {
-    anatomy: ["root label", "text", "optional required marker"],
-    composition: "Set htmlFor to the control id, or wrap the control.",
+  component: {
+    name: "Label",
+    category: "atoms",
+    type: "display",
+    description: "Accessible caption that names a form control.",
+    path: "src/components/ui/label.tsx",
+    figma: { nodeId: null },
   },
-  appearance: {
-    tokens: ["foreground", "muted-foreground"],
-    states: ["rest", "disabled (via peer)"],
+  props: {
+    htmlFor: { type: "string", required: false, description: "Id of the associated control." },
+    className: { type: "string", required: false },
   },
-  behavior: {
-    interactions: ["click forwards focus to the associated control"],
-    controllable: false,
+  variants: { axes: {}, purpose: {} },
+  relationships: {
+    mustBeParentOf: [],
+    commonPartners: ["Input", "Textarea", "Select", "Switch", "Checkbox"],
+    role: "label",
+    keyboardSupport: "Clicking forwards focus to the associated control.",
+    screenReader: "Provides the accessible name for its control.",
   },
-  accessibility: {
-    notes: ["The primary accessible name for inputs; always associate it."],
+  tokens: {
+    color: { foreground: "var(--foreground)", muted: "var(--muted-foreground)" },
+    typography: { size: "0.875rem", weight: "500" },
   },
   aiHints: {
-    priority: 2,
-    useCases: ["Name any Input, Textarea, Select, Switch, or Checkbox"],
-    antiPatterns: [
-      { avoid: "Omitting the association (htmlFor/id)", reason: "Clicking the label won't focus the control and SR pairing breaks.", instead: "Match Label htmlFor to control id." },
-    ],
-    pairsWith: ["Input", "Textarea", "Select", "Switch", "Checkbox"],
+    priority: "medium",
+    keywords: ["label", "caption", "form", "field name"],
+    selectionCriteria: { Label: "Name any interactive form control." },
+    usage: {
+      useCases: ["Name an Input, Textarea, Select, Switch, or Checkbox"],
+      commonPatterns: [
+        { name: "For/id pairing", composition: "Label htmlFor=id linked to control id." },
+      ],
+      antiPatterns: [
+        { scenario: "Omitting the htmlFor/id association", reason: "Click-to-focus and SR pairing break.", alternative: "Match Label htmlFor to the control id." },
+      ],
+    },
   },
 }

@@ -35,10 +35,20 @@ at the bottom.
 | `border` | `#17294d` | `#e4eef5` | `blue3` / `white-border` |
 | `input` | `#163259` | `#e4eef5` | `blue4` / `white-border` |
 | `ring` | `#57a9d9` | `#57a9d9` | `blue7` |
+| `heading-foreground` (custom) | `#ffffff` | `#266099` | `white` / `blue6` — see note below |
 | `radius` | `0.75rem` | `0.75rem` | `--size--border-radius` |
 
 **Charts** map to the accent + blue ramp: `chart-1 #ffd400` (yellow), `chart-2 #57a9d9`
 (blue7), `chart-3 #266099` (blue6), `chart-4 #24bfd4` (sea), `chart-5 #1a79ff` (royal).
+
+> **Headings are white, not `foreground`.** On the live site every heading (h1–h6) is
+> `color: var(--color--white)` (`#ffffff`) against the dark background — brighter than
+> body copy, which sits at `--foreground` (`#cceeff`, light-chalk). `foreground` alone is
+> too dim for headings, so this theme adds a dedicated `--heading-foreground` token: white
+> in dark mode, `blue6` (`#266099`) in light mode — mirroring the site's `.section-white`
+> heading override. `white` itself is also exposed as a standalone brand token
+> (`--color-brand-white`, `#ffffff`) alongside yellow/royal/sea/chalk for one-off use
+> (white cards, white borders, high-contrast text).
 
 > Note on borders: the live site uses a translucent glow border (`--color--lighten`
 > `#33a3ff40`). For solid shadcn components we use `blue3`/`blue4`. If you want the exact
@@ -76,6 +86,8 @@ at the bottom.
   --border: #e4eef5;
   --input: #e4eef5;
   --ring: #57a9d9;
+  /* Matches the live site's .section-white h1–h6 override (--color--blue6). */
+  --heading-foreground: #266099;
 
   --chart-1: #ffd400;
   --chart-2: #57a9d9;
@@ -117,6 +129,8 @@ at the bottom.
   --border: #17294d;
   --input: #163259;
   --ring: #57a9d9;
+  /* Matches the live site's default h1–h6 color: var(--color--white). */
+  --heading-foreground: #ffffff;
 
   --chart-1: #ffd400;
   --chart-2: #57a9d9;
@@ -139,6 +153,7 @@ at the bottom.
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-heading-foreground: var(--heading-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
@@ -177,12 +192,28 @@ at the bottom.
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* Brand color tokens (raw palette, for one-off use) */
+  --color-brand-yellow: #ffd400;
+  --color-brand-royal: #1a79ff;
+  --color-brand-sea: #24bfd4;
+  --color-brand-blue0: #0d1326;
+  --color-brand-blue7: #57a9d9;
+  --color-brand-chalk: #8ac2e5;
+  --color-brand-white: #ffffff;
+  --color-brand-white-border: #e4eef5;
 }
 
 @layer base {
   * { @apply border-border outline-ring/50; }
   body { @apply bg-background text-foreground font-sans; }
-  h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 700; letter-spacing: -0.033em; }
+  /* Headings use --heading-foreground (white), not --foreground — see note above. */
+  h1, h2, h3, h4 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: -0.033em;
+    color: var(--heading-foreground);
+  }
   h3 { font-weight: 600; }
 }
 ```

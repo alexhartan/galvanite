@@ -103,18 +103,23 @@ The root font-size is **viewport-relative**, so `em` units scale the whole syste
 Global heading treatment: `letter-spacing: -0.033em; word-spacing: 0.1em` (tightened,
 slightly airy word spacing). `text-wrap: balance` via `.wrap-balance`.
 
+**Heading color is `--color--white` (`#ffffff`) by default** — every heading (h1–h6 and
+their `.text-style-*` equivalents) is pure white against the dark navy background. This
+is overridden only inside `.section-white`, where headings recolor to `--color--blue6`
+(`#266099`) — see §5 Layout & Spacing.
+
 ### Type scale
 
 Sizes are in `em` (relative to the fluid root). Desktop → mobile shown where they differ.
 
 | Element | Font | Size (desktop) | Weight | Line-height | Notes |
 |---|---|---|---|---|---|
-| `h1` / `.text-style-h1` | Nordt Slim | `5em` (up to `5.5em` on large) | 700 | 1.1 | color white; ~2.9em on mobile |
-| `h2` / `.text-style-h2` | Nordt Slim | `3.6em` | 700 | 1.2 (1.1 tablet) | ~2.2em mobile |
-| `h3` / `.text-style-h3` | Nordt Slim | `2.6em` | 600 | 1.1 | `letter-spacing: -0.02em` |
-| `h4` / `.text-style-h4` | Nordt Slim | `2em` | 700 | 1.15 | `letter-spacing: -0.01em` |
-| `h5` / `.text-style-h5` | DM Sans | `1.6em` | 400 | 1.25 | |
-| `h6` / `.text-style-h6` | DM Sans | `1.25em` | 400 | 1.3 | |
+| `h1` / `.text-style-h1` | Nordt Slim | `5em` (up to `5.5em` on large) | 700 | 1.1 | color `--color--white`; ~2.9em on mobile |
+| `h2` / `.text-style-h2` | Nordt Slim | `3.6em` | 700 | 1.2 (1.1 tablet) | color `--color--white`; ~2.2em mobile |
+| `h3` / `.text-style-h3` | Nordt Slim | `2.6em` | 600 | 1.1 | color `--color--white`; `letter-spacing: -0.02em` |
+| `h4` / `.text-style-h4` | Nordt Slim | `2em` | 700 | 1.15 | color `--color--white`; `letter-spacing: -0.01em` |
+| `h5` / `.text-style-h5` | DM Sans | `1.6em` | 400 | 1.25 | color `--color--white` |
+| `h6` / `.text-style-h6` | DM Sans | `1.25em` | 400 | 1.3 | color `--color--white` |
 | `p` | DM Sans | `1.3em` | 400 | 1.5 | `margin-bottom: --size--xxxs` |
 | `blockquote` | DM Sans | `1.4em` | 400 | 1.45 | `border-left: 5px solid --color--blue5` |
 | `.text-eyebrow` | Nordt Slim | `1.2em` | 600 | — | color `--color--blue7`, `letter-spacing: .15em`, `word-spacing: .15em` (uppercase-style label) |
@@ -363,7 +368,7 @@ Common patterns pulled from the stylesheet:
   --color--blue6:#266099; --color--blue7:#57a9d9;
   /* Chalk / neutral */
   --color--chalk:#8ac2e5; --color--light-chalk:#cef; --color--lightest-chalk:#e6f8fa;
-  --color--white:white; --color--white-border:#e4eef5; --color--gray:#525f7a;
+  --color--white:#ffffff; --color--white-border:#e4eef5; --color--gray:#525f7a;
   /* Accent */
   --color--yellow:#ffd400; --color--royal-blue:#1a79ff; --color--sea:#24bfd4;
   /* Alpha */

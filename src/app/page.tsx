@@ -42,6 +42,7 @@ const SWATCHES = [
   { name: "ring / blue7", value: "#57a9d9" },
   { name: "chalk", value: "#8ac2e5" },
   { name: "foreground", value: "#cceeff" },
+  { name: "white / heading", value: "#ffffff" },
   { name: "primary", value: "#ffd400" },
   { name: "royal", value: "#1a79ff" },
   { name: "sea", value: "#24bfd4" },

@@ -25,7 +25,10 @@
   function findEditor() {
     // The Quill editor LinkedIn uses for the share box.
     const candidates = document.querySelectorAll(
-      'div.ql-editor[contenteditable="true"], div[role="textbox"][contenteditable="true"]'
+      'div.ql-editor[contenteditable="true"], ' +
+        'div[role="textbox"][contenteditable="true"], ' +
+        '[aria-label*="Text editor"][contenteditable="true"], ' +
+        '[data-placeholder][contenteditable="true"]'
     );
     for (const el of candidates) {
       if (el.offsetParent !== null) return el; // visible one wins
@@ -299,20 +302,37 @@
   /* Button injection                                                       */
   /* ---------------------------------------------------------------------- */
 
-  function injectButton() {
-    const editor = findEditor();
-    if (!editor) return;
-    const composer = findComposer(editor);
-    if (!composer) return;
+  function findPostButton(scope) {
+    const btns = Array.from(scope.querySelectorAll("button"));
+    return (
+      scope.querySelector(".share-actions__primary-action") ||
+      btns.find((b) => {
+        const t = (b.textContent || "").trim();
+        return t === "Post" || t === "Schedule" || t === "Next";
+      }) ||
+      null
+    );
+  }
 
-    // Already injected for this composer?
-    if (composer.querySelector("#" + BTN_ID)) {
-      currentEditor = editor;
-      return;
+  // Find the wide flex "action row" at the bottom of the composer that holds
+  // the Post button — that's where we drop our button, far left.
+  function findFooterRow(postBtn, composer) {
+    let el = postBtn.parentElement;
+    while (el && el !== composer && el !== document.body) {
+      const s = getComputedStyle(el);
+      if (
+        s.display.includes("flex") &&
+        s.flexDirection.indexOf("column") === -1 &&
+        el.clientWidth > composer.clientWidth * 0.7
+      ) {
+        return el;
+      }
+      el = el.parentElement;
     }
+    return postBtn.parentElement || composer;
+  }
 
-    currentEditor = editor;
-
+  function buildButton(editor) {
     const btn = document.createElement("button");
     btn.id = BTN_ID;
     btn.type = "button";
@@ -324,12 +344,35 @@
       currentEditor = findEditor() || editor;
       openModal();
     });
+    return btn;
+  }
 
-    // Anchor the button to the composer, bottom-left (matches the mockup and
-    // stays clear of LinkedIn's Post button on the bottom-right).
-    const cs = getComputedStyle(composer);
-    if (cs.position === "static") composer.style.position = "relative";
-    composer.appendChild(btn);
+  function injectButton() {
+    const editor = findEditor();
+    if (!editor) return;
+    const composer = findComposer(editor);
+    if (!composer) return;
+
+    currentEditor = editor;
+
+    // Already injected for this composer?
+    if (composer.querySelector("#" + BTN_ID)) return;
+
+    const btn = buildButton(editor);
+    const postBtn = findPostButton(composer);
+
+    if (postBtn) {
+      // Preferred: sit in the same row as Post, pushed to the far left.
+      const row = findFooterRow(postBtn, composer);
+      btn.classList.add("galvanite-inline");
+      row.insertBefore(btn, row.firstChild);
+    } else {
+      // Fallback: anchor to the composer card, bottom-left.
+      const cs = getComputedStyle(composer);
+      if (cs.position === "static") composer.style.position = "relative";
+      btn.classList.add("galvanite-floating");
+      composer.appendChild(btn);
+    }
 
     // Keep an open preview in sync as the user types.
     editor.addEventListener("input", () => {

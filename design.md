@@ -383,3 +383,184 @@ Common patterns pulled from the stylesheet:
   --size--border-radius:.75rem; --border-radius-sm:.3em; --border-radius-md:.9em;
 }
 ```
+
+---
+
+## Component metadata schema (`ComponentMeta`)
+
+Sections 1–6 above document the *raw brand system*. This section documents the
+*component contract* every shadcn/ui component in this repo ships alongside its
+implementation (`export const meta: ComponentMeta` in each `src/components/ui/*.tsx`),
+so humans and AI agents can reason about a component without reading its source.
+
+The schema is **four pillars + aiHints**: identity in `component`, then the four
+descriptive pillars `props`, `variants`, `relationships` (accessibility folded in), and
+`tokens`, then agent-facing `aiHints`. It is the same `meta` that drives the Storybook
+controls, the variant matrix, and the Docs page (`Components/Button` → Docs).
+
+```ts
+interface ComponentMeta {
+  component: {
+    name: string;
+    category: "atoms" | "molecules" | "organisms";
+    type: "interactive" | "display" | "container" | "input" | "navigation";
+    description: string;
+    path: string;
+    figma?: { nodeId: string | null };
+  };
+
+  props: Record<string, PropDef>;                       // { type, required?, default?, description?, options? }
+
+  variants: {                                            // ── Pillar: Variants
+    axes: Record<string, readonly string[]>;             // e.g. { variant: [...], size: [...] }
+    purpose: Record<`${string}.${string}`, string>;      // "variant.brand": "the one hero CTA"
+    invalidCombinations?: { axes: Record<string, string>; reason: string }[];
+  };
+
+  relationships: {                                       // ── Pillar: Relationships (+ a11y)
+    requires?: string[];
+    mustBeChildOf?: string[];
+    mustBeParentOf?: string[];
+    optionalSibling?: string[];
+    commonPartners?: string[];
+    triggers?: string[];
+    blocksWhen?: { when: string; effect: string }[];
+    exposesState?: string[];
+    role: string;
+    keyboardSupport: string;
+    screenReader: string;
+  };
+
+  tokens: {                                              // ── Pillar: Tokens
+    color?: Record<string, string>;
+    spacing?: Record<string, string>;
+    typography?: Record<string, string>;
+    border?: Record<string, string>;
+    motion?: Record<string, string>;
+    elevation?: Record<string, string>;
+  };
+
+  aiHints: {
+    priority: "high" | "medium" | "low";
+    keywords: string[];
+    selectionCriteria: Record<string, string>;
+    usage: {
+      useCases: string[];
+      commonPatterns: { name: string; composition: string }[];
+      antiPatterns: { scenario: string; reason: string; alternative: string }[];
+    };
+  };
+}
+```
+
+### Worked example — `Button`
+
+The Button is the first component built to this schema. Its `meta`
+(`src/components/ui/button.tsx`) is the canonical reference:
+
+```ts
+export const meta: ComponentMeta = {
+  component: {
+    name: "Button",
+    category: "atoms",
+    type: "interactive",
+    description:
+      "Primary interactive control that triggers an action or navigation. " +
+      "Carries the Galvanite yellow CTA as its `brand` variant.",
+    path: "src/components/ui/button.tsx",
+    figma: { nodeId: null },
+  },
+  props: {
+    variant: { type: "enum", default: "default",
+      options: ["default", "outline", "secondary", "ghost", "destructive", "link", "brand"] },
+    size: { type: "enum", default: "default",
+      options: ["xs", "sm", "default", "lg", "xl", "icon", "icon-xs", "icon-sm", "icon-lg"] },
+    disabled: { type: "boolean", default: false },
+    render: { type: "ReactElement", description: "Render as another element (e.g. a link)." },
+    className: { type: "string" },
+    onClick: { type: "(e: MouseEvent) => void" },
+  },
+  variants: {
+    axes: {
+      variant: ["default", "outline", "secondary", "ghost", "destructive", "link", "brand"],
+      size: ["xs", "sm", "default", "lg", "xl", "icon", "icon-xs", "icon-sm", "icon-lg"],
+    },
+    purpose: {
+      "variant.brand": "The single most important CTA on a marketing/hero surface (yellow → deep-navy on hover).",
+      "variant.default": "Standard primary action inside app UI.",
+      "variant.secondary": "Alternative action shown next to a primary one.",
+      "variant.destructive": "Irreversible or dangerous actions (delete, remove).",
+      "size.xl": "Oversized hero CTA.",
+    },
+    invalidCombinations: [
+      { axes: { variant: "link", size: "icon" },
+        reason: "A text link has no icon-only affordance; use ghost + icon size." },
+    ],
+  },
+  relationships: {
+    commonPartners: ["Tooltip", "Card", "Input", "Select"],
+    triggers: ["Dialog", "Select", "Tooltip"],
+    role: "button",
+    keyboardSupport: "Tab to focus; Enter/Space to activate.",
+    screenReader: "Announced as a button by its text; icon-only buttons require aria-label.",
+  },
+  tokens: {
+    color: {
+      background: "var(--primary)",          // #ffd400 yellow
+      foreground: "var(--primary-foreground)", // #2d4f80 blue5
+      ring: "var(--ring)",                    // #57a9d9 blue7
+      "brand.hoverBg": "var(--background)",   // #0d1326 blue0
+      "brand.glow": "var(--color-brand-blue7)",
+    },
+    border: { radius: "var(--radius-sm)" },
+    motion: { transition: "all 200ms ease", active: "scale(0.99)" },
+  },
+  aiHints: {
+    priority: "high",
+    keywords: ["button", "cta", "action", "submit", "click"],
+    selectionCriteria: {
+      brand: "The one hero call-to-action.",
+      secondary: "Secondary action beside a primary.",
+      destructive: "Delete / remove / irreversible.",
+      link: "Inline text navigation.",
+    },
+    usage: {
+      useCases: ["Submit a form", "Primary page CTA", "Open a dialog or menu", "Inline row actions"],
+      commonPatterns: [
+        { name: "CTA pair", composition: "One Button variant=brand next to Button variant=secondary." },
+        { name: "Icon button", composition: "Button size=icon wrapped in a Tooltip for its label." },
+      ],
+      antiPatterns: [
+        { scenario: "Multiple brand buttons in one viewport",
+          reason: "Dilutes the single-CTA hierarchy.",
+          alternative: "Keep one brand button; make the rest secondary/outline." },
+        { scenario: "Icon-only button without a label",
+          reason: "Screen readers announce nothing.",
+          alternative: "Add aria-label or wrap in a Tooltip." },
+      ],
+    },
+  },
+};
+```
+
+> The full set of pillar values for all 12 components lives in their respective
+> `src/components/ui/*.tsx` files; the `ComponentMetaPanel` (`src/components/component-meta-panel.tsx`)
+> renders any `meta` as the four-pillar + aiHints layout, used both on the app's
+> `/` page and in each component's Storybook **Docs** tab.
+
+---
+
+## Storybook
+
+The component library is documented in **Storybook 10** (`@storybook/nextjs-vite`,
+dark-first via a theme decorator that applies the `.dark` class + brand fonts):
+
+```bash
+npm run storybook        # dev server on :6006
+npm run build-storybook  # static build
+```
+
+Stories live next to their component (`src/components/ui/<name>.stories.tsx`); the
+**Button** (`Components/Button`) is the first story, with its controls and variant matrix
+generated from the `ComponentMeta` above and a Docs page (`button.mdx`) that renders the
+full schema.

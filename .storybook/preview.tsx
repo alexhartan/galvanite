@@ -10,7 +10,7 @@ const withTheme: Decorator = (Story, context) => {
   return (
     <div
       className={`${theme} ${fontVariables} bg-background text-foreground`}
-      style={{ minHeight: "100vh", padding: "2rem" }}
+      style={{ minHeight: "auto", padding: "2rem" }}
     >
       <Story />
     </div>

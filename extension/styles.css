@@ -147,6 +147,11 @@
   color: rgba(0, 0, 0, 0.6);
   line-height: 1.3;
   margin-top: 1px;
+  /* LinkedIn clamps the headline to a single row with an ellipsis. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 .galvanite-sub {
   display: flex;

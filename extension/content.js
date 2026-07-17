@@ -22,27 +22,43 @@
   /* Composer discovery                                                     */
   /* ---------------------------------------------------------------------- */
 
-  function findEditor() {
-    // The Quill editor LinkedIn uses for the share box.
-    const candidates = document.querySelectorAll(
-      'div.ql-editor[contenteditable="true"], ' +
-        'div[role="textbox"][contenteditable="true"], ' +
-        '[aria-label*="Text editor"][contenteditable="true"], ' +
-        '[data-placeholder][contenteditable="true"]'
-    );
-    for (const el of candidates) {
-      if (el.offsetParent !== null) return el; // visible one wins
+  function isVisible(el) {
+    return !!el && el.offsetParent !== null;
+  }
+
+  // The post-composer modal ONLY — never the inline comment box (which also
+  // uses a .ql-editor). We match the share-box container and, crucially,
+  // require it to live inside the "Create post" dialog.
+  function findComposerRoot() {
+    const selectors = [
+      ".share-box-v2__modal", // redesigned (phoenix) "Create post" modal
+      ".share-box", // classic share box
+      ".share-creation-state__share-box-v2",
+    ];
+    for (const sel of selectors) {
+      for (const el of document.querySelectorAll(sel)) {
+        if (!isVisible(el)) continue;
+        // Guard: must be the create-post surface, not a feed comment editor.
+        const inDialog = el.closest('[role="dialog"]');
+        const hasCreation = el.querySelector(".share-creation-state");
+        if (inDialog || hasCreation || el.classList.contains("share-box")) {
+          return inDialog || el;
+        }
+      }
     }
     return null;
   }
 
-  function findComposer(editor) {
-    return (
-      editor.closest('[role="dialog"]') ||
-      editor.closest(".share-box") ||
-      editor.closest(".share-creation-state") ||
-      editor.parentElement
+  function findEditor(root) {
+    root = root || findComposerRoot();
+    if (!root) return null;
+    const ed = root.querySelector(
+      '.ql-editor[contenteditable="true"], ' +
+        '[data-test-ql-editor-contenteditable="true"], ' +
+        '[aria-label*="creating content"][contenteditable="true"], ' +
+        '[role="textbox"][contenteditable="true"]'
     );
+    return isVisible(ed) ? ed : null;
   }
 
   /* ---------------------------------------------------------------------- */
@@ -258,7 +274,7 @@
   function updateModalContent() {
     const modal = document.getElementById(MODAL_ID);
     if (!modal || !currentEditor) return;
-    const composer = findComposer(currentEditor);
+    const composer = findComposerRoot();
     const info = getMemberInfo(composer);
     const bodyText = extractText(currentEditor);
     modal.querySelector(".galvanite-modal-body").innerHTML = buildPreviewCardHtml(
@@ -345,10 +361,10 @@
   }
 
   function injectButton() {
-    const editor = findEditor();
-    if (!editor) return;
-    const composer = findComposer(editor);
+    const composer = findComposerRoot();
     if (!composer) return;
+    const editor = findEditor(composer);
+    if (!editor) return;
 
     currentEditor = editor;
 
@@ -373,7 +389,7 @@
   /* ---------------------------------------------------------------------- */
 
   const observer = new MutationObserver(() => {
-    if (findEditor()) injectButton();
+    if (findComposerRoot()) injectButton();
   });
   observer.observe(document.body, { childList: true, subtree: true });
 

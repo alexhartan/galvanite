@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Galvanite — LinkedIn Hook Preview",
+  "version": "1.0.0",
+  "description": "Preview how your LinkedIn post hook will look in the feed, cut off at the preview character limit — before you post.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "Galvanite Hook Preview",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.linkedin.com/*"],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}

@@ -346,6 +346,27 @@
     btn.type = "button";
     btn.className = "galvanite-preview-btn galvanite-anchored";
     btn.textContent = "Preview Hook";
+    // Critical styles inline as a safety net, so the button is positioned and
+    // visible even if the content-script CSS fails to load for any reason.
+    btn.style.cssText = [
+      "position:absolute",
+      "left:16px",
+      "top:50%",
+      "transform:translateY(-50%)",
+      "z-index:2147483000",
+      "display:inline-flex",
+      "align-items:center",
+      "gap:6px",
+      "padding:8px 18px",
+      "font-size:15px",
+      "font-weight:600",
+      "line-height:1",
+      "color:#ffffff",
+      "background:#0a66c2",
+      "border:none",
+      "border-radius:9999px",
+      "cursor:pointer",
+    ].join(";");
     btn.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -383,6 +404,10 @@
       anchor.style.position = "relative";
     }
     anchor.appendChild(btn);
+    console.info(
+      "[Galvanite] Preview Hook button injected into .%s",
+      anchor.className || anchor.tagName
+    );
 
     // Keep an open preview in sync as the user types.
     editor.addEventListener("input", () => {

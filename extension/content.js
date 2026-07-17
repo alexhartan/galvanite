@@ -23,7 +23,13 @@
   /* ---------------------------------------------------------------------- */
 
   function isVisible(el) {
-    return !!el && el.offsetParent !== null;
+    // Note: don't use offsetParent — it is null for position:fixed elements
+    // (LinkedIn's modal), which would wrongly report the composer as hidden.
+    if (!el) return false;
+    return (
+      el.getClientRects().length > 0 &&
+      (el.offsetWidth > 0 || el.offsetHeight > 0)
+    );
   }
 
   // The post-composer modal ONLY — never the inline comment box (which also

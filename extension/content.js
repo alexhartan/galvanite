@@ -104,10 +104,15 @@
       if (alt && !/^photo of/i.test(alt)) info.name = alt;
     }
 
-    // --- Name / avatar from the composer header itself (most accurate)
+    // --- Name / avatar from the composer header itself (most accurate).
+    // Covers the redesigned share box (share-box-v2 / phoenix), whose header
+    // is an artdeco entity lockup inside the settings-entry button.
     if (composer) {
       const composerName = firstText(
         [
+          ".share-unified-settings-entry-button .artdeco-entity-lockup__title .truncate",
+          ".share-unified-settings-entry-button .artdeco-entity-lockup__title .text-body-large-bold",
+          ".share-unified-settings-entry-button .artdeco-entity-lockup__title",
           ".share-box-feed-entry__name",
           ".share-box-feed-entry__actor-name",
           "[data-testid='share-box-actor-name']",
@@ -117,18 +122,29 @@
       if (composerName) info.name = composerName;
 
       const composerAvatar = composer.querySelector(
-        ".share-box-feed-entry__avatar img, img.share-box-feed-entry__avatar-image, .presence-entity__image"
+        ".share-unified-settings-entry-button .artdeco-entity-lockup__image img, " +
+          ".share-box-feed-entry__avatar img, " +
+          "img.share-box-feed-entry__avatar-image, " +
+          ".presence-entity__image"
       );
       if (composerAvatar && composerAvatar.src) info.avatar = composerAvatar.src;
+
+      // The header avatar's alt is the member's name — a reliable name source.
+      if (!info.name && composerAvatar && composerAvatar.alt) {
+        const alt = composerAvatar.alt.trim();
+        if (alt && !/^photo of/i.test(alt)) info.name = alt;
+      }
     }
 
-    // --- Tagline / headline from the feed left-rail identity module
+    // --- Tagline / headline from the feed left-rail identity module.
+    // Scoped so we never pick up the composer's "Post to Anyone" subtitle.
     const tagline = firstText([
       ".feed-identity-module__headline",
-      ".feed-identity-module__member-bg + * .feed-identity-module__headline",
+      ".feed-identity-module .feed-identity-module__headline",
+      ".feed-identity-module .artdeco-entity-lockup__subtitle",
+      ".feed-identity-module .t-12.t-black--light",
       ".profile-card-member-details p",
       ".pv-text-details__left-panel .text-body-medium",
-      ".artdeco-entity-lockup__subtitle",
     ]);
     if (tagline) info.tagline = tagline;
 
@@ -302,41 +318,11 @@
   /* Button injection                                                       */
   /* ---------------------------------------------------------------------- */
 
-  function findPostButton(scope) {
-    const btns = Array.from(scope.querySelectorAll("button"));
-    return (
-      scope.querySelector(".share-actions__primary-action") ||
-      btns.find((b) => {
-        const t = (b.textContent || "").trim();
-        return t === "Post" || t === "Schedule" || t === "Next";
-      }) ||
-      null
-    );
-  }
-
-  // Find the wide flex "action row" at the bottom of the composer that holds
-  // the Post button — that's where we drop our button, far left.
-  function findFooterRow(postBtn, composer) {
-    let el = postBtn.parentElement;
-    while (el && el !== composer && el !== document.body) {
-      const s = getComputedStyle(el);
-      if (
-        s.display.includes("flex") &&
-        s.flexDirection.indexOf("column") === -1 &&
-        el.clientWidth > composer.clientWidth * 0.7
-      ) {
-        return el;
-      }
-      el = el.parentElement;
-    }
-    return postBtn.parentElement || composer;
-  }
-
   function buildButton(editor) {
     const btn = document.createElement("button");
     btn.id = BTN_ID;
     btn.type = "button";
-    btn.className = "galvanite-preview-btn";
+    btn.className = "galvanite-preview-btn galvanite-anchored";
     btn.textContent = "Preview Hook";
     btn.addEventListener("click", (e) => {
       e.preventDefault();
@@ -345,6 +331,17 @@
       openModal();
     });
     return btn;
+  }
+
+  // Prefer the named footer bar (holds the Post button); the left side of it
+  // is empty, which is exactly where the mockup puts our button.
+  function findAnchor(composer) {
+    return (
+      composer.querySelector(".share-creation-state__footer") ||
+      composer.querySelector(".share-creation-state__bottom") ||
+      composer.querySelector(".share-creation-state") ||
+      composer
+    );
   }
 
   function injectButton() {
@@ -359,20 +356,11 @@
     if (composer.querySelector("#" + BTN_ID)) return;
 
     const btn = buildButton(editor);
-    const postBtn = findPostButton(composer);
-
-    if (postBtn) {
-      // Preferred: sit in the same row as Post, pushed to the far left.
-      const row = findFooterRow(postBtn, composer);
-      btn.classList.add("galvanite-inline");
-      row.insertBefore(btn, row.firstChild);
-    } else {
-      // Fallback: anchor to the composer card, bottom-left.
-      const cs = getComputedStyle(composer);
-      if (cs.position === "static") composer.style.position = "relative";
-      btn.classList.add("galvanite-floating");
-      composer.appendChild(btn);
+    const anchor = findAnchor(composer);
+    if (getComputedStyle(anchor).position === "static") {
+      anchor.style.position = "relative";
     }
+    anchor.appendChild(btn);
 
     // Keep an open preview in sync as the user types.
     editor.addEventListener("input", () => {

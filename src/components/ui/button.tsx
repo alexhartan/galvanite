@@ -26,22 +26,23 @@ const buttonVariants = cva(
         brand:
           "bg-primary text-primary-foreground font-medium tracking-tight hover:bg-background hover:text-foreground hover:shadow-[0_0_0.5rem_0_var(--color-brand-blue7)] active:scale-[0.99]",
       },
-      // Both axes are +50% of the previous values: height (vertical footprint,
-      // since these are fixed-height controls) and horizontal padding. The
-      // default lands at 48px — the height inputs/selects are aligned to.
-      // Icon-only sizes scale in lockstep so they stay square and aligned.
+      // Horizontal padding is unchanged; heights (the vertical footprint of
+      // these fixed-height controls) are reduced ~22–25% from the previous
+      // pass, landing the default at 36px — the height inputs/selects align
+      // to. Icon-only sizes track their text-size counterpart so they stay
+      // square and aligned.
       size: {
         default:
-          "h-12 gap-1.5 px-[22.5px] has-data-[icon=inline-end]:pr-[18px] has-data-[icon=inline-start]:pl-[18px]",
-        xl: "h-[72px] gap-2 px-[63px] text-base has-data-[icon=inline-end]:pr-[45px] has-data-[icon=inline-start]:pl-[45px]",
-        xs: "h-9 gap-1 px-[18px] text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-[13.5px] has-data-[icon=inline-start]:pl-[13.5px] [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-[42px] gap-1 px-[22.5px] text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-[13.5px] has-data-[icon=inline-start]:pl-[13.5px] [&_svg:not([class*='size-'])]:size-3.5",
-        lg: "h-[54px] gap-1.5 px-[22.5px] has-data-[icon=inline-end]:pr-[18px] has-data-[icon=inline-start]:pl-[18px]",
-        icon: "size-12",
+          "h-9 gap-1.5 px-[22.5px] has-data-[icon=inline-end]:pr-[18px] has-data-[icon=inline-start]:pl-[18px]",
+        xl: "h-14 gap-2 px-[63px] text-base has-data-[icon=inline-end]:pr-[45px] has-data-[icon=inline-start]:pl-[45px]",
+        xs: "h-7 gap-1 px-[18px] text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-[13.5px] has-data-[icon=inline-start]:pl-[13.5px] [&_svg:not([class*='size-'])]:size-3",
+        sm: "h-8 gap-1 px-[22.5px] text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-[13.5px] has-data-[icon=inline-start]:pl-[13.5px] [&_svg:not([class*='size-'])]:size-3.5",
+        lg: "h-10 gap-1.5 px-[22.5px] has-data-[icon=inline-end]:pr-[18px] has-data-[icon=inline-start]:pl-[18px]",
+        icon: "size-9",
         "icon-xs":
-          "size-9 in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
-        "icon-sm": "size-[42px] in-data-[slot=button-group]:rounded-lg",
-        "icon-lg": "size-[54px]",
+          "size-7 in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
+        "icon-sm": "size-8 in-data-[slot=button-group]:rounded-lg",
+        "icon-lg": "size-10",
       },
     },
     defaultVariants: {

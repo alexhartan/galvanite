@@ -1,4 +1,4 @@
-import { ArrowRight, Rocket, Sparkles } from "lucide-react";
+import { Rocket, Sparkles } from "lucide-react";
 
 import { ComponentMetaExplorer } from "@/components/component-meta-explorer";
 import { Badge } from "@/components/ui/badge";
@@ -88,7 +88,6 @@ export default function Home() {
           <div className="flex flex-wrap items-center gap-4">
             <Button variant="brand" size="xl">
               Book a call
-              <ArrowRight />
             </Button>
             <Button variant="secondary" size="xl">
               <Rocket />
@@ -147,7 +146,7 @@ export default function Home() {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <Button variant="brand" size="xl">
-              XL brand <ArrowRight />
+              XL brand
             </Button>
             <Button size="lg">Large</Button>
             <Button size="sm">Small</Button>
@@ -212,7 +211,6 @@ export default function Home() {
                 </div>
                 <Button variant="brand" className="w-full">
                   Send
-                  <ArrowRight />
                 </Button>
               </CardFooter>
             </Card>

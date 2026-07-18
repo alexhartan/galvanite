@@ -23,21 +23,21 @@ const buttonVariants = cva(
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         link: "text-primary underline-offset-4 hover:underline",
         // Galvanite hero CTA: yellow fill, inverts to deep-navy on hover with a soft blue glow.
+        // The `brand-btn` hook drives the sliding-text + animated arrow ::before defined in
+        // globals.css (laptop + non-touch only).
         brand:
-          "bg-primary text-primary-foreground font-medium tracking-tight hover:bg-background hover:text-foreground hover:shadow-[0_0_0.5rem_0_var(--color-brand-blue7)] active:scale-[0.99]",
+          "brand-btn bg-primary text-primary-foreground font-medium tracking-tight hover:bg-background hover:text-foreground hover:shadow-[0_0_0.5rem_0_var(--color-brand-blue7)] active:scale-[0.99]",
       },
-      // Horizontal padding is unchanged; heights (the vertical footprint of
-      // these fixed-height controls) are reduced ~22–25% from the previous
-      // pass, landing the default at 36px — the height inputs/selects align
-      // to. Icon-only sizes track their text-size counterpart so they stay
-      // square and aligned.
+      // Uniform 25px horizontal padding across every text-bearing size (the
+      // asymmetric icon-inset offsets are dropped so padding is genuinely
+      // uniform — the brand button's hover slide is defined in globals.css).
+      // Icon-only sizes stay square.
       size: {
-        default:
-          "h-9 gap-1.5 px-[22.5px] has-data-[icon=inline-end]:pr-[18px] has-data-[icon=inline-start]:pl-[18px]",
-        xl: "h-14 gap-2 px-[63px] text-base has-data-[icon=inline-end]:pr-[45px] has-data-[icon=inline-start]:pl-[45px]",
-        xs: "h-7 gap-1 px-[18px] text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-[13.5px] has-data-[icon=inline-start]:pl-[13.5px] [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-8 gap-1 px-[22.5px] text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-[13.5px] has-data-[icon=inline-start]:pl-[13.5px] [&_svg:not([class*='size-'])]:size-3.5",
-        lg: "h-10 gap-1.5 px-[22.5px] has-data-[icon=inline-end]:pr-[18px] has-data-[icon=inline-start]:pl-[18px]",
+        default: "h-9 gap-1.5 px-[25px]",
+        xl: "h-14 gap-2 px-[25px] text-base",
+        xs: "h-7 gap-1 px-[25px] text-xs in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
+        sm: "h-8 gap-1 px-[25px] text-[0.8rem] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3.5",
+        lg: "h-10 gap-1.5 px-[25px]",
         icon: "size-9",
         "icon-xs":
           "size-7 in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",

@@ -183,3 +183,41 @@
     letter-spacing: -0.02em;
   }
 }
+
+/*
+  Brand CTA hover behaviour — the galvanite.io signature: on hover the label
+  slides left (padding 15px / 35px) and an animated yellow arrow scales in via
+  ::before. Gated to laptop-and-above, hover-capable, fine (non-touch) pointers
+  so touch devices get the plain button with none of this. Written unlayered so
+  it wins over the Tailwind padding utilities without a specificity fight.
+*/
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  .brand-btn {
+    position: relative;
+    /* Existing transition (all, ~150ms) plus a dedicated 0.3s ease on padding. */
+    transition: all 0.15s ease, padding 0.3s ease;
+  }
+  .brand-btn:hover {
+    padding-left: 15px;
+    padding-right: 35px;
+  }
+  .brand-btn::before {
+    position: absolute;
+    inset: calc(50% - 0.5rem) 0.83rem 0 auto;
+    border: 0.5rem solid var(--primary);
+    display: block;
+    content: "";
+    height: 0;
+    border-left-color: transparent;
+    border-bottom-color: transparent;
+    transform: scale(0.75);
+    transform-origin: -100% 200%;
+    opacity: 0;
+    z-index: 0;
+  }
+  .brand-btn:hover::before {
+    transform: scale(1);
+    opacity: 1;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-in;
+  }
+}

@@ -59,15 +59,13 @@ type Story = StoryObj<typeof meta>;
 /** Interactive playground — drive every prop from the Controls panel. */
 export const Playground: Story = {};
 
-/** The signature Galvanite CTA: yellow → deep-navy invert on hover. */
+/**
+ * The signature Galvanite CTA. On hover (laptop + non-touch only) the label
+ * slides left and the yellow arrow scales in via ::before — so no manual icon
+ * is needed here. Hover it in the canvas to see it.
+ */
 export const Brand: Story = {
   args: { variant: "brand", size: "xl" },
-  render: (args) => (
-    <Button {...args}>
-      {args.children}
-      <ArrowRight />
-    </Button>
-  ),
 };
 
 /** Every `variant` axis value from the schema, with its documented purpose. */
@@ -102,9 +100,9 @@ export const Sizes: Story = {
   ),
 };
 
-/** Icon + label composition. */
+/** Icon + label composition. (Default variant, so it doesn't trigger the brand ::before arrow.) */
 export const WithIcon: Story = {
-  args: { variant: "brand" },
+  args: { variant: "default" },
   render: (args) => (
     <div className="flex flex-wrap items-center gap-3">
       <Button {...args}>

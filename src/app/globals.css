@@ -1,3 +1,10 @@
+/*
+  DM Sans (body/UI face) from Google Fonts. Loaded via plain CSS @import
+  rather than next/font so it renders identically everywhere this
+  stylesheet is used — the Next app, Storybook (Vite preview), and any
+  future context — with no dependency on a bundler-specific font loader.
+*/
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -69,6 +76,13 @@
 /* Light theme — .section-white inversion */
 :root {
   --radius: 0.75rem;
+
+  /*
+    Real value, defined once (theme-independent). Deliberately unlayered so
+    it always wins over @theme inline's `--font-sans: var(--font-sans)`
+    indirection — no next/font class required for this to resolve.
+  */
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
 
   --background: #ffffff;
   --foreground: #163259;

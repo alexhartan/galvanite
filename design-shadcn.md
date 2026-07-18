@@ -59,6 +59,9 @@ at the bottom.
 ## `globals.css` (drop-in)
 
 ```css
+/* DM Sans from Google Fonts — see "Fonts" below for why this is a plain
+   @import rather than next/font. */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -66,6 +69,7 @@ at the bottom.
 
 :root {
   --radius: 0.75rem;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
 
   --background: #ffffff;
   --foreground: #163259;
@@ -104,8 +108,7 @@ at the bottom.
   --sidebar-border: #e4eef5;
   --sidebar-ring: #57a9d9;
 
-  /* Brand fonts */
-  --font-sans: "DM Sans", Arial, sans-serif;
+  /* Nordt Slim stays self-hosted via next/font/local — see "Fonts" below. */
   --font-heading: "Nordt Slim", sans-serif;
 }
 
@@ -222,37 +225,53 @@ at the bottom.
 
 ## Fonts
 
-Both are custom / self-hosted on the live site. For a shadcn project use `next/font/local`
-(or `@font-face`) and expose them as the CSS variables above.
+- **DM Sans** — variable, weights `100–1000`. Body / UI (`--font-sans`). **Loaded from
+  Google Fonts** via a plain CSS `@import` in `globals.css`, not `next/font` — that keeps
+  it working identically in every context that loads the stylesheet (the app, Storybook's
+  Vite preview, etc.) with no dependency on a bundler-specific font-loader transform:
 
-- **DM Sans** — variable, weights `100–1000`. Body / UI (`--font-sans`).
-- **Nordt Slim** — static: `Light` = 400, `SemiLight` = 600, `Regular` = 700.
+  ```css
+  @import url("https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&display=swap");
+  ```
+
+  Then give the Tailwind theme token a real, unlayered value (wins over `@theme inline`'s
+  `--font-sans: var(--font-sans)` indirection regardless of source order, per CSS cascade
+  layer rules):
+
+  ```css
+  :root {
+    --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  }
+  ```
+
+- **Nordt Slim** — proprietary, not on Google Fonts, so it stays self-hosted via
+  `next/font/local`: static weights `Light` = 400, `SemiLight` = 600, `Regular` = 700.
   Headings (`--font-heading`).
 
-```ts
-// app/fonts.ts (next/font/local example)
-import localFont from "next/font/local";
+  ```ts
+  // src/lib/fonts.ts
+  import localFont from "next/font/local";
 
-export const dmSans = localFont({
-  src: "./fonts/DMSans-VariableFont_opsz,wght.ttf",
-  variable: "--font-sans",
-  display: "swap",
-});
+  export const nordtSlim = localFont({
+    src: [
+      { path: "../fonts/NordtSlim-Light.otf",     weight: "400" },
+      { path: "../fonts/NordtSlim-SemiLight.otf", weight: "600" },
+      { path: "../fonts/NordtSlim-Regular.otf",   weight: "700" },
+    ],
+    variable: "--font-heading",
+    display: "swap",
+  });
+  ```
+  Apply `nordtSlim.variable` to `<html>` so `--font-heading` resolves. If you don't have
+  the licensed Nordt Slim files, substitute a close geometric slim sans such as
+  `Space Grotesk` or `Michroma` as a placeholder.
 
-export const nordtSlim = localFont({
-  src: [
-    { path: "./fonts/NordtSlim-Light.otf",     weight: "400" },
-    { path: "./fonts/NordtSlim-SemiLight.otf", weight: "600" },
-    { path: "./fonts/NordtSlim-Regular.otf",   weight: "700" },
-  ],
-  variable: "--font-heading",
-  display: "swap",
-});
-```
-Add both `variable` classes to `<html>` / `<body>` so `--font-sans` and `--font-heading`
-resolve. (If you don't have the licensed font files, `DM Sans` is on Google Fonts;
-`Nordt Slim` is proprietary — substitute a close geometric slim sans such as
-`Space Grotesk` or `Michroma` as a placeholder.)
+> Why the split? `next/font/local`'s font-injection only runs under Next.js's own
+> build (webpack/SWC) — it silently no-ops under Storybook's Vite build, so components
+> rendered there fall back to the browser/Storybook default font. A plain `@import` has
+> no such dependency, so it's the more robust choice for a font every context needs to
+> render correctly. Nordt Slim keeps `next/font/local` since it's brand-proprietary and
+> not available as a hosted CDN font.
 
 ---
 

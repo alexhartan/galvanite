@@ -512,7 +512,8 @@ export const meta: ComponentMeta = {
       "brand.hoverBg": "var(--background)",   // #0d1326 blue0
       "brand.glow": "var(--color-brand-blue7)",
     },
-    border: { radius: "var(--radius-sm)" },
+    // Uniform across every variant/size — half of the original brand-button radius.
+    border: { radius: "calc(var(--radius-sm) * 0.5)" },
     motion: { transition: "all 200ms ease", active: "scale(0.99)" },
   },
   aiHints: {

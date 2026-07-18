@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { dmSans, nordtSlim } from "@/lib/fonts";
+import { fontVariables } from "@/lib/fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,7 +15,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`dark ${dmSans.variable} ${nordtSlim.variable} h-full antialiased`}
+      className={`dark ${fontVariables} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

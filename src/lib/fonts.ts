@@ -1,14 +1,12 @@
 import localFont from "next/font/local";
 
-// Body / UI — DM Sans (variable), the brand's self-hosted body face.
-export const dmSans = localFont({
-  src: "../fonts/DMSans-Variable.ttf",
-  variable: "--font-sans",
-  weight: "100 1000",
-  display: "swap",
-});
+// Body / UI — DM Sans is loaded from Google Fonts via a plain CSS @import
+// in globals.css (see the note there), not next/font: that keeps it working
+// identically in Storybook's Vite build, which doesn't run next/font's
+// Next.js-only build transform.
 
-// Headings — Nordt Slim, the brand's proprietary display face.
+// Headings — Nordt Slim, the brand's proprietary display face (not on
+// Google Fonts, so it stays self-hosted via next/font/local).
 export const nordtSlim = localFont({
   src: [
     { path: "../fonts/NordtSlim-Light.otf", weight: "400", style: "normal" },
@@ -19,5 +17,5 @@ export const nordtSlim = localFont({
   display: "swap",
 });
 
-/** Combined font-variable class names — apply to a root element. */
-export const fontVariables = `${dmSans.variable} ${nordtSlim.variable}`;
+/** Font-variable class names — apply to a root element. */
+export const fontVariables = nordtSlim.variable;

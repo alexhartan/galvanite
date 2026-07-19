@@ -28,16 +28,16 @@ const buttonVariants = cva(
         brand:
           "brand-btn bg-primary text-primary-foreground font-medium tracking-tight hover:bg-background hover:text-foreground hover:shadow-[0_0_0.5rem_0_var(--color-brand-blue7)] active:scale-[0.99]",
       },
-      // Uniform 25px horizontal padding across every text-bearing size (the
+      // Uniform 20px horizontal padding across every text-bearing size (the
       // asymmetric icon-inset offsets are dropped so padding is genuinely
       // uniform — the brand button's hover slide is defined in globals.css).
       // Icon-only sizes stay square.
       size: {
-        default: "h-9 gap-1.5 px-[25px]",
-        xl: "h-14 gap-2 px-[25px] text-base",
-        xs: "h-7 gap-1 px-[25px] text-xs in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-8 gap-1 px-[25px] text-[0.8rem] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3.5",
-        lg: "h-10 gap-1.5 px-[25px]",
+        default: "h-9 gap-1.5 px-[20px]",
+        xl: "h-14 gap-2 px-[20px] text-base",
+        xs: "h-7 gap-1 px-[20px] text-xs in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
+        sm: "h-8 gap-1 px-[20px] text-[0.8rem] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3.5",
+        lg: "h-10 gap-1.5 px-[20px]",
         icon: "size-9",
         "icon-xs":
           "size-7 in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",

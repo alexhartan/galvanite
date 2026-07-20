@@ -1,0 +1,33 @@
+import { Meta, Title, Subtitle, Description, Primary, Controls, Stories } from "@storybook/addon-docs/blocks";
+
+import { ComponentMetaPanel } from "../component-meta-panel";
+import { meta as buttonMeta } from "./button";
+import * as ButtonStories from "./button.stories";
+
+<Meta of={ButtonStories} />
+
+<Title />
+
+<Subtitle>{buttonMeta.component.description}</Subtitle>
+
+`{buttonMeta.component.path}` · category **{buttonMeta.component.category}** · type **{buttonMeta.component.type}**
+
+<Primary />
+
+<Controls />
+
+---
+
+## Component metadata
+
+The Button ships a machine-readable `ComponentMeta` — the four pillars
+(**Props · Variants · Relationships · Tokens**) plus **aiHints**. This is the same
+`meta` the Storybook controls and variant matrix above are generated from.
+
+<ComponentMetaPanel meta={buttonMeta} />
+
+---
+
+## Stories
+
+<Stories includePrimary={false} />

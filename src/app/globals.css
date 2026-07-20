@@ -1,0 +1,223 @@
+/*
+  DM Sans (body/UI face) from Google Fonts. Loaded via plain CSS @import
+  rather than next/font so it renders identically everywhere this
+  stylesheet is used — the Next app, Storybook (Vite preview), and any
+  future context — with no dependency on a bundler-specific font loader.
+*/
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&display=swap");
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+  Galvanite theme — mapped from design-shadcn.md.
+  Dark = the live galvanite.io site (deep navy + yellow CTA).
+  Light = the site's .section-white inversion.
+  Values are plain hex (valid in Tailwind v4).
+*/
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-heading: var(--font-heading);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-heading-foreground: var(--heading-foreground);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Brand color tokens (raw palette, for one-off use) */
+  --color-brand-yellow: #ffd400;
+  --color-brand-royal: #1a79ff;
+  --color-brand-sea: #24bfd4;
+  --color-brand-blue0: #0d1326;
+  --color-brand-blue7: #57a9d9;
+  --color-brand-chalk: #8ac2e5;
+  --color-brand-white: #ffffff;
+  --color-brand-white-border: #e4eef5;
+}
+
+/* Light theme — .section-white inversion */
+:root {
+  --radius: 0.75rem;
+
+  /*
+    Real value, defined once (theme-independent). Deliberately unlayered so
+    it always wins over @theme inline's `--font-sans: var(--font-sans)`
+    indirection — no next/font class required for this to resolve.
+  */
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --background: #ffffff;
+  --foreground: #163259;
+  --card: #ffffff;
+  --card-foreground: #163259;
+  --popover: #ffffff;
+  --popover-foreground: #163259;
+  --primary: #ffd400;
+  --primary-foreground: #2d4f80;
+  --secondary: #e6f8fa;
+  --secondary-foreground: #266099;
+  --muted: #e6f8fa;
+  --muted-foreground: #525f7a;
+  --accent: #266099;
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --border: #e4eef5;
+  --input: #e4eef5;
+  --ring: #57a9d9;
+  /* Matches the live site's .section-white h1–h6 override (--color--blue6). */
+  --heading-foreground: #266099;
+
+  --chart-1: #ffd400;
+  --chart-2: #57a9d9;
+  --chart-3: #266099;
+  --chart-4: #24bfd4;
+  --chart-5: #1a79ff;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #163259;
+  --sidebar-primary: #ffd400;
+  --sidebar-primary-foreground: #2d4f80;
+  --sidebar-accent: #e6f8fa;
+  --sidebar-accent-foreground: #266099;
+  --sidebar-border: #e4eef5;
+  --sidebar-ring: #57a9d9;
+}
+
+/* Dark theme — the live galvanite.io site */
+.dark {
+  --background: #0d1326;
+  --foreground: #cceeff;
+  --card: #111933;
+  --card-foreground: #cceeff;
+  --popover: #162140;
+  --popover-foreground: #cceeff;
+  --primary: #ffd400;
+  --primary-foreground: #2d4f80;
+  --secondary: #162140;
+  --secondary-foreground: #cceeff;
+  --muted: #17294d;
+  --muted-foreground: #8ac2e5;
+  --accent: #266099;
+  --accent-foreground: #ffffff;
+  --destructive: #e5484d;
+  --border: #17294d;
+  --input: #163259;
+  --ring: #57a9d9;
+  /* Matches the live site's default h1–h6 color: var(--color--white). */
+  --heading-foreground: #ffffff;
+
+  --chart-1: #ffd400;
+  --chart-2: #57a9d9;
+  --chart-3: #266099;
+  --chart-4: #24bfd4;
+  --chart-5: #1a79ff;
+
+  --sidebar: #111933;
+  --sidebar-foreground: #cceeff;
+  --sidebar-primary: #ffd400;
+  --sidebar-primary-foreground: #2d4f80;
+  --sidebar-accent: #162140;
+  --sidebar-accent-foreground: #cceeff;
+  --sidebar-border: #17294d;
+  --sidebar-ring: #57a9d9;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: -0.033em;
+    word-spacing: 0.1em;
+    line-height: 1.1;
+    color: var(--heading-foreground);
+  }
+  h3 {
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+}
+
+/*
+  Brand CTA hover behaviour — the galvanite.io signature: on hover the label
+  slides left (padding 10px / 30px) and an animated yellow arrow scales in via
+  ::before. Gated to laptop-and-above, hover-capable, fine (non-touch) pointers
+  so touch devices get the plain button with none of this. Written unlayered so
+  it wins over the Tailwind padding utilities without a specificity fight.
+*/
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  .brand-btn {
+    position: relative;
+    /* Existing transition (all, ~150ms) plus a dedicated 0.3s ease on padding. */
+    transition: all 0.15s ease, padding 0.3s ease;
+  }
+  .brand-btn:hover {
+    padding-left: 10px;
+    padding-right: 30px;
+  }
+  .brand-btn::before {
+    position: absolute;
+    inset: calc(50% - 0.5rem) 0.6rem 0 auto;
+    border: 0.45rem solid var(--primary);
+    display: block;
+    content: "";
+    height: 0;
+    border-left-color: transparent;
+    border-bottom-color: transparent;
+    transform: scale(0.75);
+    transform-origin: -100% 200%;
+    opacity: 0;
+    z-index: 0;
+  }
+  .brand-btn:hover::before {
+    transform: scale(1);
+    opacity: 1;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-in;
+  }
+}

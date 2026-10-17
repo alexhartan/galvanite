@@ -9,10 +9,8 @@
 :root{--deep:#162140;--matte:#31507A;--sky:#9ACCE5;--white:#FFFFFF;--gold:#FFD400;--charcoal:#525F7A;color-scheme:dark}
 html,body{height:100%;background:var(--deep);overflow:hidden}
 .stage{background:repeating-linear-gradient(to bottom,rgb(255 255 255/.03) 0 1px,transparent 1px 4px),linear-gradient(180deg,#1d2c55 0%,var(--deep) 100%);touch-action:none}
-.ghost{font-size:24vw;line-height:.8;color:rgb(22 33 64/.6)}
 </style>
 <main id="stage" class="stage relative h-full w-full overflow-hidden select-none font-body text-white">
-<p id="ghost" class="ghost pointer-events-none absolute bottom-[12%] -left-[3vw] whitespace-nowrap font-display" aria-hidden="true">LEVEL 1</p>
 <canvas id="sky" class="absolute inset-0 h-full w-full" aria-label="Paper plane flying through a maze of bars"></canvas>
 <header class="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-6 sm:p-10">
 <svg class="h-10 w-10 sm:h-12 sm:w-12" viewBox="0 0 100 100" role="img" aria-label="Galvanite"><defs><clipPath id="gTop"><polygon points="2,0 100,0 100,25 27,25"/></clipPath><clipPath id="gC"><polygon points="0,6 94,100 0,100"/></clipPath></defs><g clip-path="url(#gTop)" fill="#9ACCE5"><circle cx="50" cy="50" r="37.5" fill="none" stroke="#9ACCE5" stroke-width="25"/><rect x="50" y="0" width="50" height="25"/></g><g clip-path="url(#gC)" fill="#FFFFFF"><circle cx="50" cy="50" r="37.5" fill="none" stroke="#FFFFFF" stroke-width="25"/><rect x="50" y="75" width="50" height="25"/></g><polygon points="57,50 100,50 100,93" fill="#FFD400"/></svg>
@@ -34,20 +32,20 @@ html,body{height:100%;background:var(--deep);overflow:hidden}
 </main>
 <script>
 const stage=document.getElementById('stage'),cv=document.getElementById('sky'),cx=cv.getContext('2d');
-const ui={ghost:document.getElementById('ghost'),level:document.getElementById('level'),timer:document.getElementById('timer'),lives:[...document.querySelectorAll('#lives li')],panel:document.getElementById('panel'),title:document.getElementById('panelTitle'),text:document.getElementById('panelText'),btn:document.getElementById('startBtn')};
-const LEVEL_TIME=30,reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const P={x:0,y:0,vx:0,vy:0,tx:0,ty:0,a:0,L:120};
-let W=0,H=0,BW=20,bars=[],nextX=0,prev='bottom',state='ready',level=1,lives=3,left=LEVEL_TIME,flown=0,inv=0,t=0,last=performance.now();
+const ui={level:document.getElementById('level'),timer:document.getElementById('timer'),lives:[...document.querySelectorAll('#lives li')],panel:document.getElementById('panel'),title:document.getElementById('panelTitle'),text:document.getElementById('panelText'),btn:document.getElementById('startBtn')};
+const LEVEL_TIME=30;
+const P={x:0,y:0,tx:0,ty:0,a:0,lift:0,L:120};
+let W=0,H=0,BW=20,bars=[],nextX=0,prev='bottom',state='ready',level=1,lives=3,left=LEVEL_TIME,flown=0,inv=0,last=performance.now();
 const clamp=(v,a,b)=>Math.min(Math.max(v,a),b),rand=(a,b)=>a+Math.random()*(b-a);
 const bounds=()=>{const minX=P.L*.5+16,maxX=Math.max(minX,W/2-P.L*.5);return{minX,maxX,minY:P.L*.3+8,maxY:H-P.L*.3-8}};
 const speed=()=>W*Math.min(.22+.04*(level-1),.5);
 const fmt=s=>{s=Math.max(0,Math.ceil(s));return`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`};
-function resize(){const oW=W,oH=H,dpr=Math.min(devicePixelRatio||1,2),r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0);P.L=clamp(Math.min(W*.13,H*.2),64,180);BW=clamp(W*.015,14,30);if(!oW){P.x=P.tx=W*.22;P.y=P.ty=H*.45;build(W*.62);return}const sx=W/oW,sy=H/oH;bars.forEach(b=>{b.x*=sx;b.y0*=sy;b.y1*=sy});nextX*=sx;P.x*=sx;P.y*=sy;P.tx*=sx;P.ty*=sy}
+function resize(){const oW=W,oH=H,dpr=Math.min(devicePixelRatio||1,2),r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0);P.L=clamp(Math.min(W*.15,H*.24),72,240);BW=clamp(W*.015,14,30);if(!oW){P.tx=W*.3;P.y=P.ty=H*.45;const B=bounds();P.x=B.minX+(B.maxX-B.minX)*.3;build(W*.62);return}const sx=W/oW,sy=H/oH;bars.forEach(b=>{b.x*=sx;b.y0*=sy;b.y1*=sy});nextX*=sx;P.x*=sx;P.y*=sy;P.tx*=sx;P.ty*=sy}
 function spawn(x){const kind=Math.random()<.3?'pair':(prev==='top'?'bottom':'top');prev=kind;if(kind==='top')bars.push({x,y0:0,y1:H*rand(.4,.6)});else if(kind==='bottom')bars.push({x,y0:H*(1-rand(.4,.6)),y1:H});else{const g=H*Math.max(.26,.36-.015*(level-1)),c=rand(g/2+H*.1,H-g/2-H*.1);bars.push({x,y0:0,y1:c-g/2},{x,y0:c+g/2,y1:H})}}
 function fill(){while(nextX<W+BW){spawn(nextX);nextX+=Math.max(200,W*rand(.3,.42))}}
 function build(x){bars=[];nextX=x;fill()}
 function setLives(){ui.lives.forEach((li,i)=>{li.classList.toggle('text-gold',i<lives);li.classList.toggle('text-charcoal',i>=lives)})}
-function setLevel(){const s=`LEVEL ${level}`;ui.ghost.textContent=s;ui.level.textContent=s}
+function setLevel(){ui.level.textContent=`LEVEL ${level}`}
 function start(){if(state==='over')build(W*.85);state='play';level=1;lives=3;left=LEVEL_TIME;flown=0;inv=0;setLives();setLevel();ui.panel.hidden=true;stage.classList.add('cursor-none')}
 function over(){state='over';stage.classList.remove('cursor-none');ui.title.textContent=`Grounded on level ${level}`;ui.text.textContent=`You flew for ${fmt(flown)}. Three hits and the flight is over.`;ui.btn.textContent='Fly again';ui.panel.hidden=false;ui.btn.focus()}
 function aim(e){const r=cv.getBoundingClientRect();P.tx=e.clientX-r.left;P.ty=e.clientY-r.top}
@@ -57,22 +55,20 @@ addEventListener('keydown',e=>{if(e.key==='Enter'&&state!=='play'&&document.acti
 addEventListener('resize',resize);
 const SHAPE=[[.5,0],[-.36,-.2],[-.5,.17],[-.27,.27],[0,0],[.15,.02]];
 function hit(){const c=Math.cos(P.a),s=Math.sin(P.a);return SHAPE.some(([lx,ly])=>{lx*=.85*P.L;ly*=.85*P.L;const px=P.x+lx*c-ly*s,py=P.y+lx*s+ly*c;return bars.some(b=>px>=b.x&&px<=b.x+BW&&py>=b.y0&&py<=b.y1)})}
-function update(dt){t+=dt;const B=bounds(),wind=reduce?0:(Math.sin(t*1.3)+Math.sin(t*2.9+1)*.5)*H*.008;
-const tx=clamp(P.tx,B.minX,B.maxX),ty=clamp(P.ty,B.minY,B.maxY)+wind;
-P.vx+=((tx-P.x)*7-P.vx*5.2)*dt;P.vy+=((ty-P.y)*16-P.vy*5.6)*dt;P.x+=P.vx*dt;P.y+=P.vy*dt;
-if(P.x>B.maxX){P.x=B.maxX;P.vx=Math.min(P.vx,0)}if(P.x<B.minX){P.x=B.minX;P.vx=Math.max(P.vx,0)}
-if(P.y>B.maxY){P.y=B.maxY;P.vy=Math.min(P.vy,0)}if(P.y<B.minY){P.y=B.minY;P.vy=Math.max(P.vy,0)}
-P.a+=(clamp(P.vy*.0011,-.45,.45)-P.a)*(1-Math.exp(-dt*8));
+function update(dt){const B=bounds(),e=k=>1-Math.exp(-dt/k);
+const tx=B.minX+(B.maxX-B.minX)*clamp(P.tx/W,0,1),ty=clamp(P.ty,B.minY,B.maxY);
+P.x=clamp(P.x+(tx-P.x)*e(.5),B.minX,B.maxX);P.y=clamp(P.y+(ty-P.y)*e(.35),B.minY,B.maxY);
+P.lift+=(1-2*(ty-B.minY)/(B.maxY-B.minY)-P.lift)*e(.2);P.a=-P.lift*.07;
 if(state!=='play')return;
 const d=speed()*dt;bars.forEach(b=>b.x-=d);nextX-=d;bars=bars.filter(b=>b.x+BW>0);fill();
 flown+=dt;left-=dt;if(left<=0){level++;left=LEVEL_TIME;setLevel()}
 if(inv>0)inv-=dt;else if(hit()){lives--;setLives();inv=1.6;if(!lives)over()}}
 function plane(){cx.save();cx.translate(P.x,P.y);cx.rotate(P.a);cx.scale(P.L,P.L);cx.globalAlpha=inv>0&&state==='play'&&Math.floor(inv*10)%2?.35:1;
 const poly=(pts,f)=>{cx.beginPath();pts.forEach(([x,y],i)=>i?cx.lineTo(x,y):cx.moveTo(x,y));cx.closePath();cx.fillStyle=f;cx.fill()};
-poly([[.5,0],[-.18,.1],[-.27,.27]],'#BFDDEE');
-poly([[.5,0],[-.2,-.02],[-.5,.17],[-.18,.1]],'#FFFFFF');
+poly([[.5,0],[-.18,.1+.02*P.lift],[-.27,.27+.06*P.lift]],'#BFDDEE');
+poly([[.5,0],[-.2,-.02],[-.5,.17],[-.18,.1+.02*P.lift]],'#FFFFFF');
 poly([[.5,0],[-.36,-.2],[-.2,-.02]],'#E3F0F8');
-cx.beginPath();cx.moveTo(.5,0);cx.lineTo(-.2,-.02);cx.moveTo(.5,0);cx.lineTo(-.18,.1);cx.strokeStyle='rgba(154,204,229,.8)';cx.lineWidth=1.2/P.L;cx.stroke();cx.restore()}
+cx.beginPath();cx.moveTo(.5,0);cx.lineTo(-.2,-.02);cx.moveTo(.5,0);cx.lineTo(-.18,.1+.02*P.lift);cx.strokeStyle='rgba(154,204,229,.8)';cx.lineWidth=1.2/P.L;cx.stroke();cx.restore()}
 function draw(){cx.clearRect(0,0,W,H);cx.fillStyle='rgba(154,204,229,.72)';bars.forEach(b=>cx.fillRect(b.x,b.y0,BW,b.y1-b.y0));plane()}
 let shown='';
 function frame(now){const dt=Math.min((now-last)/1000,1/30);last=now;update(dt);draw();const s=fmt(left);if(s!==shown){shown=s;ui.timer.textContent=s}requestAnimationFrame(frame)}

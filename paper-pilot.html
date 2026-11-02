@@ -44,7 +44,7 @@ html,body{height:100%;background:var(--deep);overflow:hidden}
 const stage=document.getElementById('stage'),cv=document.getElementById('sky'),cx=cv.getContext('2d');
 const ui={level:document.getElementById('level'),timer:document.getElementById('timer'),lives:[...document.querySelectorAll('#lives li')],panel:document.getElementById('panel'),title:document.getElementById('panelTitle'),text:document.getElementById('panelText'),btn:document.getElementById('startBtn'),tune:document.getElementById('tune'),tuneBtn:document.getElementById('tuneBtn'),sliders:document.getElementById('sliders'),god:document.getElementById('t-god'),reset:document.getElementById('tuneReset')};
 const LEVEL_TIME=30,DEF={plane:.6,bars:.6,course:1,speed:1,inertia:1,god:true};
-const SPEC=[['plane','Plane size',.3,1.5],['bars','Obstacle size',.3,1.5],['course','Course scale',.6,1.6],['speed','Speed',.25,2.5],['inertia','Inertia',.2,3]];
+const SPEC=[['plane','Plane size',.3,1.5],['bars','Obstacle size',.3,1.5],['course','Course scale',.4,2.5],['speed','Speed',.25,2.5],['inertia','Inertia',.2,3]];
 let cfg={...DEF};try{Object.assign(cfg,JSON.parse(localStorage.getItem('pp-tune')||'{}'))}catch(e){}
 const P={x:0,y:0,vx:0,vy:0,tx:0,ty:0,a:0,lift:0,L:120};
 let W=0,H=0,BW=20,bars=[],nextX=0,prev='bottom',state='ready',level=1,lives=3,left=LEVEL_TIME,flown=0,inv=0,last=performance.now();
@@ -54,11 +54,12 @@ const speed=()=>W*Math.min(.22+.04*(level-1),.5)*cfg.speed;
 const fmt=s=>{s=Math.max(0,Math.ceil(s));return`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`};
 function sizes(){P.L=clamp(Math.min(W*.15,H*.24),72,240)*cfg.plane;BW=clamp(W*.015,14,30)*cfg.bars}
 function resize(){const oW=W,oH=H,dpr=Math.min(devicePixelRatio||1,2),r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0);sizes();if(!oW){P.tx=W*.3;P.y=P.ty=H*.45;const B=bounds();P.x=B.minX+(B.maxX-B.minX)*.3;build(W*.62);return}const sx=W/oW,sy=H/oH;bars.forEach(b=>{b.x*=sx;b.y0*=sy;b.y1*=sy});nextX*=sx;P.x*=sx;P.y*=sy;P.tx*=sx;P.ty*=sy}
-function spawn(x){const c=cfg.course,kind=Math.random()<.3?'pair':(prev==='top'?'bottom':'top');prev=kind;const open=()=>H*clamp(rand(.4,.6)*c,.15,.85);
+function spawn(x){const kind=Math.random()<.3?'pair':(prev==='top'?'bottom':'top');prev=kind;const open=()=>H*rand(.4,.6);
 if(kind==='top')bars.push({x,y0:0,y1:H-open()});else if(kind==='bottom')bars.push({x,y0:open(),y1:H});
-else{const g=H*clamp(Math.max(.26,.36-.015*(level-1))*c,.1,.7),m=rand(g/2+H*.1,H-g/2-H*.1);bars.push({x,y0:0,y1:m-g/2},{x,y0:m+g/2,y1:H})}}
+else{const g=H*Math.max(.26,.36-.015*(level-1)),m=rand(g/2+H*.1,H-g/2-H*.1);bars.push({x,y0:0,y1:m-g/2},{x,y0:m+g/2,y1:H})}}
 function fill(){while(nextX<W+BW){spawn(nextX);nextX+=Math.max(200,W*rand(.3,.42))*cfg.course}}
 function build(x){bars=[];nextX=x;fill()}
+function respace(r){const a=P.x+P.L;bars.forEach(b=>{if(b.x>a)b.x=a+(b.x-a)*r});nextX=a+(nextX-a)*r;fill()}
 function setLives(){ui.lives.forEach((li,i)=>{li.classList.toggle('text-gold',i<lives);li.classList.toggle('text-charcoal',i>=lives)})}
 function setLevel(){ui.level.textContent=`LEVEL ${level}`}
 function start(){if(state==='over')build(W*.85);state='play';level=1;lives=3;left=LEVEL_TIME;flown=0;inv=0;setLives();setLevel();ui.panel.hidden=true;stage.classList.add('cursor-none')}
@@ -68,9 +69,9 @@ ui.sliders.innerHTML=SPEC.map(([k,l,mn,mx])=>`<label for="t-${k}" class="grid ga
 function syncTune(){SPEC.forEach(([k])=>{document.getElementById('t-'+k).value=cfg[k];document.getElementById('o-'+k).textContent=Math.round(cfg[k]*100)+'%'});ui.god.checked=cfg.god}
 function saveTune(){sizes();syncTune();try{localStorage.setItem('pp-tune',JSON.stringify(cfg))}catch(e){}}
 function toggleTune(){ui.tune.hidden=!ui.tune.hidden;ui.tuneBtn.setAttribute('aria-expanded',String(!ui.tune.hidden))}
-ui.tune.addEventListener('input',e=>{const k=e.target.id.slice(2);if(k==='god')cfg.god=e.target.checked;else cfg[k]=+e.target.value;saveTune()});
+ui.tune.addEventListener('input',e=>{const k=e.target.id.slice(2);if(k==='god')cfg.god=e.target.checked;else{if(k==='course')respace(+e.target.value/cfg.course);cfg[k]=+e.target.value}saveTune()});
 ui.tune.addEventListener('submit',e=>e.preventDefault());
-ui.reset.addEventListener('click',()=>{cfg={...DEF};saveTune()});
+ui.reset.addEventListener('click',()=>{respace(DEF.course/cfg.course);cfg={...DEF};saveTune()});
 ui.tuneBtn.addEventListener('click',toggleTune);
 [ui.tune,ui.tuneBtn].forEach(el=>el.addEventListener('pointermove',e=>e.stopPropagation()));
 stage.addEventListener('pointermove',aim);stage.addEventListener('pointerdown',e=>{if(!e.target.closest('#tune,#tuneBtn'))aim(e)});

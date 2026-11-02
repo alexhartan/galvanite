@@ -47,21 +47,22 @@ html,body{height:100%;background:var(--deep);overflow:hidden}
 <script>
 const stage=document.getElementById('stage'),cv=document.getElementById('sky'),cx=cv.getContext('2d');
 const ui={level:document.getElementById('level'),timer:document.getElementById('timer'),lives:[...document.querySelectorAll('#lives li')],panel:document.getElementById('panel'),title:document.getElementById('panelTitle'),text:document.getElementById('panelText'),btn:document.getElementById('startBtn'),tune:document.getElementById('tune'),tuneBtn:document.getElementById('tuneBtn'),sliders:document.getElementById('sliders'),god:document.getElementById('t-god'),reset:document.getElementById('tuneReset'),now:document.getElementById('o-now'),fs:document.getElementById('fsBtn')};
-const LEVEL_TIME=30,DEF={plane:.85,bars:.5,course:2.5,speed:1,accel:1,inertia:2,god:true};
-const SPEC=[['plane','Plane size',.3,1.5],['bars','Obstacle size',.3,1.5],['course','Course scale',.4,2.5],['speed','Speed',.25,2.5],['accel','Acceleration',0,2.5],['inertia','Inertia',.2,3]];
-let cfg={...DEF};try{Object.assign(cfg,JSON.parse(localStorage.getItem('pp-tune')||'{}'))}catch(e){}
+const LEVEL_TIME=30,DEF={plane:1,bars:1,course:1,speed:1,accel:1,inertia:1,god:true};
+const SPEC=[['plane','Plane size'],['bars','Obstacle size'],['course','Course scale'],['speed','Speed'],['accel','Acceleration'],['inertia','Inertia']];
+let cfg={...DEF};try{Object.assign(cfg,JSON.parse(localStorage.getItem('pp-tune2')||'{}'))}catch(e){}
+const eff=(k,f=.05)=>Math.max(cfg[k],f);
 const P={x:0,y:0,vx:0,vy:0,tx:0,ty:0,a:0,lift:0,L:120};
 let W=0,H=0,BW=20,bars=[],nextX=0,prev='bottom',state='ready',level=1,lives=3,left=LEVEL_TIME,flown=0,inv=0,boost=1,last=performance.now();
 const clamp=(v,a,b)=>Math.min(Math.max(v,a),b),rand=(a,b)=>a+Math.random()*(b-a);
 const bounds=()=>{const minX=P.L*.5+16,maxX=Math.max(minX,W/2-P.L*.5);return{minX,maxX,minY:P.L*.3+8,maxY:H-P.L*.3-8}};
-const speed=()=>W*.22*cfg.speed*boost;
+const speed=()=>W*.33*cfg.speed*boost;
 const fmt=s=>{s=Math.max(0,Math.ceil(s));return`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`};
-function sizes(){P.L=clamp(Math.min(W*.15,H*.24),72,240)*cfg.plane;BW=clamp(W*.015,14,30)*cfg.bars}
+function sizes(){P.L=clamp(Math.min(W*.15,H*.24),72,240)*.85*eff('plane');BW=clamp(W*.015,14,30)*.8*eff('bars')}
 function resize(){const oW=W,oH=H,dpr=Math.min(devicePixelRatio||1,2),r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0);sizes();if(!oW){P.tx=W*.3;P.y=P.ty=H*.45;const B=bounds();P.x=B.minX+(B.maxX-B.minX)*.3;build(W*.62);return}const sx=W/oW,sy=H/oH;bars.forEach(b=>{b.x*=sx;b.y0*=sy;b.y1*=sy});nextX*=sx;P.x*=sx;P.y*=sy;P.tx*=sx;P.ty*=sy}
 function spawn(x){const kind=Math.random()<.3?'pair':(prev==='top'?'bottom':'top');prev=kind;const open=()=>H*rand(.4,.6);
 if(kind==='top')bars.push({x,y0:0,y1:H-open()});else if(kind==='bottom')bars.push({x,y0:open(),y1:H});
 else{const g=H*Math.max(.26,.36-.015*(level-1)),m=rand(g/2+H*.1,H-g/2-H*.1);bars.push({x,y0:0,y1:m-g/2},{x,y0:m+g/2,y1:H})}}
-function fill(){while(nextX<W+BW){spawn(nextX);nextX+=Math.max(200,W*rand(.3,.42))*cfg.course}}
+function fill(){while(nextX<W+BW){spawn(nextX);nextX+=Math.max(200,W*rand(.3,.42))*2.5*eff('course')}}
 function build(x){bars=[];nextX=x;fill()}
 function respace(r){const a=P.x+P.L;bars.forEach(b=>{if(b.x>a)b.x=a+(b.x-a)*r});nextX=a+(nextX-a)*r;fill()}
 function setLives(){ui.lives.forEach((li,i)=>{li.classList.toggle('text-gold',i<lives);li.classList.toggle('text-charcoal',i>=lives)})}
@@ -71,13 +72,13 @@ function over(){state='over';stage.classList.remove('cursor-none');ui.title.text
 function pause(){state='paused';stage.classList.remove('cursor-none');ui.title.textContent='Paused';ui.text.textContent='Press Esc or Resume to keep flying.';ui.btn.textContent='Resume';ui.panel.hidden=false}
 function resume(){state='play';ui.panel.hidden=true;stage.classList.add('cursor-none')}
 function aim(e){const r=cv.getBoundingClientRect();P.tx=e.clientX-r.left;P.ty=e.clientY-r.top}
-ui.sliders.innerHTML=SPEC.map(([k,l,mn,mx])=>`<label for="t-${k}" class="grid gap-2 text-sm"><span class="flex justify-between"><span>${l}</span><output id="o-${k}" class="tabular-nums text-sky"></output></span><input id="t-${k}" type="range" min="${mn}" max="${mx}" step="0.05" class="w-full accent-gold"></label>`).join('');
+ui.sliders.innerHTML=SPEC.map(([k,l])=>`<label for="t-${k}" class="grid gap-2 text-sm"><span class="flex justify-between"><span>${l}</span><output id="o-${k}" class="tabular-nums text-sky"></output></span><input id="t-${k}" type="range" min="0" max="2" step="0.05" class="w-full accent-gold"></label>`).join('');
 function syncTune(){SPEC.forEach(([k])=>{document.getElementById('t-'+k).value=cfg[k];document.getElementById('o-'+k).textContent=Math.round(cfg[k]*100)+'%'});ui.god.checked=cfg.god}
-function saveTune(){sizes();syncTune();try{localStorage.setItem('pp-tune',JSON.stringify(cfg))}catch(e){}}
+function saveTune(){sizes();syncTune();try{localStorage.setItem('pp-tune2',JSON.stringify(cfg))}catch(e){}}
 function toggleTune(){ui.tune.hidden=!ui.tune.hidden;ui.tuneBtn.setAttribute('aria-expanded',String(!ui.tune.hidden))}
-ui.tune.addEventListener('input',e=>{const k=e.target.id.slice(2);if(k==='god')cfg.god=e.target.checked;else{if(k==='course')respace(+e.target.value/cfg.course);cfg[k]=+e.target.value}saveTune()});
+ui.tune.addEventListener('input',e=>{const k=e.target.id.slice(2);if(k==='god')cfg.god=e.target.checked;else{const o=eff('course');cfg[k]=+e.target.value;if(k==='course')respace(eff('course')/o)}saveTune()});
 ui.tune.addEventListener('submit',e=>e.preventDefault());
-ui.reset.addEventListener('click',()=>{respace(DEF.course/cfg.course);cfg={...DEF};saveTune()});
+ui.reset.addEventListener('click',()=>{const o=eff('course');cfg={...DEF};respace(eff('course')/o);saveTune()});
 ui.tuneBtn.addEventListener('click',toggleTune);
 ui.fs.hidden=!document.fullscreenEnabled;
 function toggleFs(){if(ui.fs.hidden)return;(document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()).catch(()=>{ui.fs.hidden=true})}
@@ -91,7 +92,7 @@ addEventListener('keydown',e=>{if(e.key==='t'||e.key==='T')toggleTune();else if(
 addEventListener('resize',resize);
 const SHAPE=[[.5,0],[-.36,-.2],[-.5,.17],[-.27,.27],[0,0],[.15,.02]];
 function hit(){const c=Math.cos(P.a),s=Math.sin(P.a);return SHAPE.some(([lx,ly])=>{lx*=.85*P.L;ly*=.85*P.L;const px=P.x+lx*c-ly*s,py=P.y+lx*s+ly*c;return bars.some(b=>px>=b.x&&px<=b.x+BW&&py>=b.y0&&py<=b.y1)})}
-function update(dt){if(state==='paused')return;const B=bounds(),wx=1/(.45*cfg.inertia),wy=1/(.3*cfg.inertia);
+function update(dt){if(state==='paused')return;const B=bounds(),wx=1/(.9*eff('inertia',.1)),wy=1/(.6*eff('inertia',.1));
 const tx=B.minX+(B.maxX-B.minX)*clamp(P.tx/W,0,1),ty=clamp(P.ty,B.minY,B.maxY);
 P.vx+=(wx*wx*(tx-P.x)-2*wx*P.vx)*dt;P.vy+=(wy*wy*(ty-P.y)-2*wy*P.vy)*dt;P.x+=P.vx*dt;P.y+=P.vy*dt;
 if(P.x>B.maxX||P.x<B.minX){P.x=clamp(P.x,B.minX,B.maxX);P.vx=0}if(P.y>B.maxY||P.y<B.minY){P.y=clamp(P.y,B.minY,B.maxY);P.vy=0}
@@ -99,7 +100,7 @@ const pos=1-2*(P.y-B.minY)/(B.maxY-B.minY),lean=clamp(-P.vy/(H*.6),-1,1);
 P.lift+=((pos+lean)/2-P.lift)*(1-Math.exp(-dt/.15));P.a=-P.lift*.09;
 if(state!=='play')return;
 const d=speed()*dt;bars.forEach(b=>b.x-=d);nextX-=d;bars=bars.filter(b=>b.x+BW>0);fill();
-flown+=dt;left-=dt;boost=Math.min(boost*Math.pow(1.02,cfg.accel/2.5*dt),4);if(left<=0){level++;left=LEVEL_TIME;setLevel()}
+flown+=dt;left-=dt;boost=Math.min(boost*Math.pow(1.008,cfg.accel*dt),4);if(left<=0){level++;left=LEVEL_TIME;setLevel()}
 if(inv>0)inv-=dt;else if(hit()){inv=cfg.god?.6:1.6;if(!cfg.god){lives--;setLives();if(!lives)over()}}}
 function plane(){cx.save();cx.translate(P.x,P.y);cx.rotate(P.a);cx.scale(P.L,P.L);cx.globalAlpha=inv>0&&state==='play'&&Math.floor(inv*10)%2?.35:1;
 const poly=(pts,f)=>{cx.beginPath();pts.forEach(([x,y],i)=>i?cx.lineTo(x,y):cx.moveTo(x,y));cx.closePath();cx.fillStyle=f;cx.fill()};
